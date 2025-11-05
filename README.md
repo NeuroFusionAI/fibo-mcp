@@ -122,7 +122,3 @@ resp = client.responses.create(
 - **Coverage**: 3,371 classes, 16,057 labeled entities, 1,259 properties
 - **Cache**: Turtle format at `./data/fibo.db` (auto-downloaded on first run)
 - **Updates**: `uv run main.py --force-download` to get latest FIBO
-## Source
-
-FIBO: https://github.com/edmcouncil/fibo
-EDM Council: https://spec.edmcouncil.org/fibo/
