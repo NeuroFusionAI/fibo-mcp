@@ -44,7 +44,11 @@ A country is a distinct political entity with several key characteristics:
 - They may be recognized by other countries and international organizations (like the UN)
 - They exercise sovereignty - the supreme authority within their territory
 
-**Note:** The terms "country," "nation," "state," and "nation-state" are often used interchangeably but have subtle differences...
+**Note:** The terms "country," "nation," "state," and "nation-state" are often used interchangeably but have subtle differences:
+  - Country - A general term for a geographical-political entity
+  - State - Emphasizes the political and governmental structure
+  - Nation - Refers to a group of people sharing common culture, language, or history
+  - Nation-state - When a nation and state align (one dominant cultural group in one political entity)
 </td>
 <td valign="top">
 
