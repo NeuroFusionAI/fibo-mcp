@@ -6,18 +6,17 @@ Give your financial agent access to the Financial Industry Business Ontology (FI
 
 [FIBO](https://spec.edmcouncil.org/fibo/) is the industry-standard financial ontology covering currencies, securities, derivatives, markets, legal entities, and business concepts.
 
-## Quick Start with Claude Code
+![FIBO Graph Visualization](docs/fibo_graph.png)
+
+## Quick Start
 
 ```bash
-# install
+# Install dependencies
 uv sync
 
-# connect to claude code
-claude mcp add --transport stdio fibo-mcp uv run main.py
+# Connect to Claude Desktop
+claude mcp add --transport stdio fibo-mcp uv run /path/to/fibo-mcp/main.py
 ```
-
-Restart Claude Code. First run auto-downloads FIBO, then cached instantly.
-
 
 ## Example Result
 
@@ -83,22 +82,46 @@ A sovereign state in FIBO is:
 
 **Why this matters:** Financial institutions need precise jurisdiction classification for regulatory compliance, cross-border transactions, sanctions screening, and legal entity identification (LEI). FIBO's structured definitions ensure consistent interpretation across systems and jurisdictions.
 
-## Remote Access
+## Remote Access with ngrok
 
 ```bash
-# run http server
-uv run main.py --http --port 8001
+# 1. Start FIBO MCP server
+uv run main.py --http --port 8000
 
-# connect from anywhere
-claude mcp add --transport http fibo-mcp http://localhost:8001/mcp
+# 2. In another terminal, expose via ngrok
+ngrok http 8000
+
+# 3. Use the ngrok URL (e.g., https://abc123.ngrok.io)
+```
+
+### OpenAI API Integration
+
+```python
+from openai import OpenAI
+
+client = OpenAI()
+
+# Configure FIBO MCP as a tool
+resp = client.responses.create(
+    model="gpt-5",
+    tools=[
+        {
+            "type": "mcp",
+            "server_label": "fibo",
+            "server_url": "https://your-ngrok-url.ngrok.io/mcp",  # Your ngrok URL
+            "require_approval": "never",
+        },
+    ],
+    input="What is a corporate according to FIBO?",
+)
 ```
 
 ## Technical Details
 
 - **Data**: 129,990 triples from FIBO ontology (299 RDF/OWL files)
 - **Coverage**: 3,371 classes, 16,057 labeled entities, 1,259 properties
-- **Cache**: Turtle format at `./data/fibo.db` (auto-created on first run)
-- **Updates**: Optional `uv run main.py --force-update`
+- **Cache**: Turtle format at `./data/fibo.db` (auto-downloaded on first run)
+- **Updates**: `uv run main.py --force-download` to get latest FIBO
 ## Source
 
 FIBO: https://github.com/edmcouncil/fibo

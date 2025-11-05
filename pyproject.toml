@@ -4,9 +4,7 @@ version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = [
   "fastmcp>=2.0.0",
-  "pytest>=8.4.2",
   "pytest-asyncio>=0.23.0",
   "rdflib>=7.0.0",
-  "starlette>=0.37.0",
-  "uvicorn>=0.29.0",
+  "rank-bm25>=0.2.2",
 ]
