@@ -3,7 +3,6 @@ from pathlib import Path
 from datetime import datetime
 from fastmcp import FastMCP
 from rdflib import Graph
-from rdflib.plugins.stores.berkeleydb import has_bsddb
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s', stream=sys.stderr)
 logger = logging.getLogger(__name__)
@@ -569,7 +568,7 @@ if __name__ == "__main__":
   parser.add_argument("--setup", action="store_true", help="download and load fibo")
   parser.add_argument("--force-update", action="store_true", help="force re-download fibo (ignore cache)")
   parser.add_argument("--http", action="store_true", help="run in http mode")
-  parser.add_argument("--port", type=int, default=8001, help="http port")
+  parser.add_argument("--port", type=int, default=8000, help="http port")
   parser.add_argument("--host", default="0.0.0.0", help="http host")
   parser.add_argument("--verbose", "-v", action="store_true", help="enable debug logging")
   args = parser.parse_args()
