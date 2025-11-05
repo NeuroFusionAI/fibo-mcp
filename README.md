@@ -23,11 +23,11 @@ Restart Claude Code. First run auto-downloads FIBO, then cached instantly.
 
 <table>
 <tr>
-<th>Claude Code</th>
-<th>Claude Code + fibo-mcp </th>
+<th width="50%">Claude Code</th>
+<th width="50%">Claude Code + fibo-mcp </th>
 </tr>
 <tr>
-<td valign="top">
+<td width="50%" valign="top">
 
 > **"What is a country?"**
 
