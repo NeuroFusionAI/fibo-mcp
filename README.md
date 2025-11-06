@@ -6,7 +6,7 @@ Give your financial agent access to the Financial Industry Business Ontology (FI
 
 [FIBO](https://spec.edmcouncil.org/fibo/) is the industry-standard financial ontology covering currencies, securities, derivatives, markets, legal entities, and business concepts.
 
-<img src="assets/fibo_graph.png" alt="FIBO Graph Visualization" width="400">
+<img src="assets/fibo_graph.png" alt="FIBO Graph Visualization" width="500">
 
 ## Quick Start
 
