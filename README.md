@@ -53,29 +53,28 @@ A country is a distinct political entity with several key characteristics:
 
 > **"What is a country according to FIBO?"**
 
-According to FIBO, a "country" is formally defined as a **sovereign state**:
+According to FIBO, a country is represented as a Sovereign State, which is defined as:
 
-**Definition:** A non-physical juridical entity that is represented by one centralized government that has sovereignty over a geographic area.
+  A non-physical juridical entity that is represented by one centralized government that has sovereignty over a geographic area
 
-**Key characteristics:**
-- A legal entity represented by one centralized government
-- Has a permanent population
-- Has defined territory
-- Has the capacity to enter into relations with other sovereign states
+  The ontology provides additional clarification in an explanatory note:
 
-**Hierarchy:**
+  A legal entity that is represented by one centralized government, has a permanent population, defined territory, and the capacity to enter into relations with other sovereign
+  states.
 
-A sovereign state in FIBO is:
-- A type of **polity** (a legal person representing a supranational entity, crown, state, or civil authority)
-- A **government body**
-- A **legal person**
-- A **formal organization**
+  Key Characteristics:
 
-**FIBO also recognizes:**
-- **Federated sovereignty** as a subclass of sovereign state, which represents a polity characterized by a union of partially self-governing states or regions under a central (federal) government
+  1. Legal entity status - It's a juridical/legal person
+  2. Centralized government - Represented by one central governing authority
+  3. Sovereignty - Has sovereign power over a defined area
+  4. Geographic territory - Has defined territorial boundaries
+  5. Permanent population - Has a stable population
+  6. International capacity - Can enter into relations with other sovereign states
 
-**Precision:** Instead of using the informal term "country," FIBO uses the more precise legal/financial term "sovereign state" to refer to what we commonly call countries, emphasizing their status as legal entities with sovereignty over territory and the ability to enter into international relations.
+  In the FIBO ontology hierarchy, a Sovereign State is a specialized type of Polity, which is broadly defined as a legal person representing entities such as states, municipalities,
+  or other civil authorities.
 
+  The concept is located in: BE/GovernmentEntities/GovernmentEntities/SovereignState
 </td>
 </tr>
 </table>
