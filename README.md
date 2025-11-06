@@ -49,7 +49,7 @@ A country is a distinct political entity with several key characteristics:
   - Nation - Refers to a group of people sharing common culture, language, or history
   - Nation-state - When a nation and state align (one dominant cultural group in one political entity)
 </td>
-<td valign="top">
+<td width="50%" valign="top">
 
 > **"What is a country according to FIBO?"**
 
