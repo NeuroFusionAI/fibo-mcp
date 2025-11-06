@@ -14,7 +14,7 @@ Give your financial agent access to the Financial Industry Business Ontology (FI
 # Install dependencies
 uv sync
 
-# Connect to Claude Desktop
+# Connect to Claude Code
 claude mcp add --transport stdio fibo-mcp uv run /path/to/fibo-mcp/main.py
 ```
 
