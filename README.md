@@ -20,13 +20,13 @@ claude mcp add --transport stdio fibo-mcp uv run /path/to/fibo-mcp/main.py
 
 ## Example Result
 
-<table>
+<table style="table-layout: fixed; width: 100%;">
 <tr>
-<th width="50%">Claude Code</th>
-<th width="50%">Claude Code + fibo-mcp </th>
+<th style="width: 50%;">Claude Code</th>
+<th style="width: 50%;">Claude Code + fibo-mcp </th>
 </tr>
 <tr>
-<td width="50%" valign="top">
+<td style="width: 50%; vertical-align: top;">
 
 > **"What is a country?"**
 
@@ -49,7 +49,7 @@ A country is a distinct political entity with several key characteristics:
   - Nation - Refers to a group of people sharing common culture, language, or history
   - Nation-state - When a nation and state align (one dominant cultural group in one political entity)
 </td>
-<td width="50%" valign="top">
+<td style="width: 50%; vertical-align: top;">
 
 > **"What is a country according to FIBO?"**
 
