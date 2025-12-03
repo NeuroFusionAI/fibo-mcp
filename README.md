@@ -128,5 +128,5 @@ resp = client.responses.create(
 
 - **Data**: 129,990 triples from FIBO ontology (299 RDF/OWL files)
 - **Coverage**: 3,371 classes, 16,057 labeled entities, 1,259 properties
-- **Cache**: Turtle format at `./data/fibo.db` (auto-downloaded on first run)
+- **Cache**: Turtle format at `./data/fibo.ttl` (auto-downloaded on first run)
 - **Updates**: `uv run main.py --force-download` to get latest FIBO
