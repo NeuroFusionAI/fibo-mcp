@@ -54,30 +54,35 @@ A country is a distinct political entity with several key characteristics:
 </td>
 <td width="50%" valign="top">
 
-> **"What is a country according to FIBO?"**
+> **"What is a country?"**
 
-According to FIBO, a country is represented as a Sovereign State, which is defined as:
+According to FIBO, a country is represented as a
+<span style="color:red">Sovereign State</span>, which is defined as:
 
-  A non-physical juridical entity that is represented by one centralized government that has sovereignty over a geographic area
+A non-physical <span style="color:red">juridical entity</span> that is represented by one <span style="color:red">centralized government</span> that has <span style="color:red">sovereignty</span> over a geographic area.
 
-  The ontology provides additional clarification in an explanatory note:
+The ontology provides additional clarification in an explanatory note:
 
-  A legal entity that is represented by one centralized government, has a permanent population, defined territory, and the capacity to enter into relations with other sovereign
-  states.
+A legal entity that is represented by one <span style="color:red">centralized government</span>, has a <span style="color:red">permanent population</span>, <span style="color:red">defined territory</span>, and the <span style="color:red">capacity to enter into relations with other sovereign states</span>.
 
-  Key Characteristics:
+Key Characteristics:
 
-  1. Legal entity status - It's a juridical/legal person
-  2. Centralized government - Represented by one central governing authority
-  3. Sovereignty - Has sovereign power over a defined area
-  4. Geographic territory - Has defined territorial boundaries
-  5. Permanent population - Has a stable population
-  6. International capacity - Can enter into relations with other sovereign states
+Legal entity status — It's a <span style="color:red">juridical/legal person</span>
 
-  In the FIBO ontology hierarchy, a Sovereign State is a specialized type of Polity, which is broadly defined as a legal person representing entities such as states, municipalities,
-  or other civil authorities.
+Centralized government — Represented by one central governing authority
 
-  The concept is located in: BE/GovernmentEntities/GovernmentEntities/SovereignState
+Sovereignty — Has sovereign power over a defined area
+
+Geographic territory — Has defined territorial boundaries
+
+Permanent population — Has a stable population
+
+International capacity — Can enter into relations with other sovereign states
+
+In the FIBO ontology hierarchy, a <span style="color:red">Sovereign State</span> is a specialized type of <span style="color:red">Polity</span>, which is broadly defined as a legal person representing entities such as states, municipalities, or other civil authorities.
+
+The concept is located in:
+BE/GovernmentEntities/GovernmentEntities/SovereignState
 </td>
 </tr>
 </tbody>
