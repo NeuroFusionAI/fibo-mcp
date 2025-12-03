@@ -35,18 +35,18 @@ claude mcp add --transport stdio fibo-mcp uv run /path/to/fibo-mcp/main.py
 
 A country is a distinct political entity with several key characteristics:
 
-**Core Elements:**
+Core Elements:
 - Defined territory - A geographical area with recognized borders
 - Permanent population - People who reside within those borders
 - Sovereign government - An independent authority that exercises control over the territory and population
 - Capacity to enter relations with other states - The ability to engage in diplomatic and international relations
 
-**Additional aspects:**
+Additional aspects:
 - Countries typically have their own legal system, currency, and institutions
 - They may be recognized by other countries and international organizations (like the UN)
 - They exercise sovereignty - the supreme authority within their territory
 
-**Note:** The terms "country," "nation," "state," and "nation-state" are often used interchangeably but have subtle differences:
+Note: The terms "country," "nation," "state," and "nation-state" are often used interchangeably but have subtle differences:
   - Country - A general term for a geographical-political entity
   - State - Emphasizes the political and governmental structure
   - Nation - Refers to a group of people sharing common culture, language, or history
@@ -57,17 +57,17 @@ A country is a distinct political entity with several key characteristics:
 > **"What is a country?"**
 
 According to FIBO, a country is represented as a
-<span style="color:red">Sovereign State</span>, which is defined as:
+**Sovereign State**, which is defined as:
 
-A non-physical <span style="color:red">juridical entity</span> that is represented by one <span style="color:red">centralized government</span> that has <span style="color:red">sovereignty</span> over a geographic area.
+A non-physical **juridical entity** that is represented by one **centralized government** that has **sovereignty** over a geographic area.
 
 The ontology provides additional clarification in an explanatory note:
 
-A legal entity that is represented by one <span style="color:red">centralized government</span>, has a <span style="color:red">permanent population</span>, <span style="color:red">defined territory</span>, and the <span style="color:red">capacity to enter into relations with other sovereign states</span>.
+A legal entity that is represented by one **centralized government**, has a **permanent population**, **defined territory**, and the **capacity to enter into relations with other sovereign states**.
 
 Key Characteristics:
 
-Legal entity status — It's a <span style="color:red">juridical/legal person</span>
+Legal entity status — It's a **juridical/legal person**
 
 Centralized government — Represented by one central governing authority
 
@@ -79,7 +79,7 @@ Permanent population — Has a stable population
 
 International capacity — Can enter into relations with other sovereign states
 
-In the FIBO ontology hierarchy, a <span style="color:red">Sovereign State</span> is a specialized type of <span style="color:red">Polity</span>, which is broadly defined as a legal person representing entities such as states, municipalities, or other civil authorities.
+In the FIBO ontology hierarchy, a **Sovereign State** is a specialized type of **Polity**, which is broadly defined as a legal person representing entities such as states, municipalities, or other civil authorities.
 
 The concept is located in:
 BE/GovernmentEntities/GovernmentEntities/SovereignState
