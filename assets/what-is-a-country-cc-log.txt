@@ -1,0 +1,147 @@
+> what is a country? 
+
+⏺ I'll look up the definition of "country" in the FIBO ontology.
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n\nSELECT
+                         ?class ?label ?definition\nWHERE {\n  ?class rdfs:label ?label .\n  FILTER(LCASE(STR(?label)) = \"country\")\n  OPTIONAL {
+                         ?class skos:definition ?definition }\n}")
+  ⎿  {                                                     
+       "result": "{\n  \"results\": [],\n  \"count\": 0\n}"
+     }
+
+⏺ Let me search more broadly:
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n\nSELECT
+                         ?class ?label ?definition\nWHERE {\n  ?class rdfs:label ?label .\n  FILTER(CONTAINS(LCASE(STR(?label)), \"country\"))\n
+                         OPTIONAL { ?class skos:definition ?definition }\n}\nLIMIT 20")
+  ⎿ {                                                                                                                                            
+      "result": "{\n  \"results\": [\n    {\n      \"class\": \"https://spec.edmcouncil.org/fibo/ontology/SEC/Funds/CollectiveInvestmentVehicles/
+    authorizedCountry\",\n      \"label\": \"authorized country\",\n      \"definition\": \"Country in which it is authorised to commercialise th
+    … +12 lines (ctrl+o to expand)
+
+
+
+⏺ These are properties referencing countries. Let me search for the Country class itself:
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\nPREFIX
+                         owl: <http://www.w3.org/2002/07/owl#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n\nSELECT ?class ?label
+                         ?definition\nWHERE {\n  ?class rdf:type owl:Class .\n  ?class rdfs:label ?label .\n  FILTER(CONTAINS(LCASE(STR(?label)),
+                         \"country\"))\n  OPTIONAL { ?class skos:definition ?definition }\n}\nLIMIT 20")
+  ⎿  {                                                     
+       "result": "{\n  \"results\": [],\n  \"count\": 0\n}"
+     }
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos:
+                         <http://www.w3.org/2004/02/skos/core#>\nPREFIX lcc-cr:
+                         <https://www.omg.org/spec/LCC/Countries/CountryRepresentation/>\n\nSELECT ?class ?label ?definition
+                         ?comment\nWHERE {\n  VALUES ?class { lcc-cr:Country }\n  OPTIONAL { ?class rdfs:label ?label }\n
+                         OPTIONAL { ?class skos:definition ?definition }\n  OPTIONAL { ?class rdfs:comment ?comment }\n}")
+  ⎿  {                                                     
+       "result": "{\n  \"results\": [],\n  \"count\": 0\n}"
+     }
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos:
+                         <http://www.w3.org/2004/02/skos/core#>\n\nSELECT ?class ?label ?definition ?comment\nWHERE {\n
+                         FILTER(CONTAINS(LCASE(STR(?class)), \"country\"))\n  OPTIONAL { ?class rdfs:label ?label }\n  OPTIONAL {
+                         ?class skos:definition ?definition }\n  OPTIONAL { ?class rdfs:comment ?comment }\n}\nLIMIT 30")
+  ⎿ {                                                                                                                        
+      "result": "{\n  \"results\": [\n    {\n      \"class\": \"https://spec.edmcouncil.org/fibo/ontology/SEC/Funds/Collectiv
+    eInvestmentVehicles/authorizedCountry\",\n      \"label\": \"authorized country\",\n      \"definition\": \"Country in wh
+    … +14 lines (ctrl+o to expand)
+
+
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos:
+                         <http://www.w3.org/2004/02/skos/core#>\nPREFIX fibo-be-ge-ge:
+                         <https://spec.edmcouncil.org/fibo/ontology/BE/GovernmentEntities/GovernmentEntities/>\n\nSELECT ?s ?p
+                         ?o\nWHERE {\n  ?s ?p ?o .\n  FILTER(CONTAINS(LCASE(STR(?s)), \"geopoliticalentity\") ||
+                         CONTAINS(LCASE(STR(?s)), \"country\"))\n}\nLIMIT 50")
+  ⎿ {                                                                                                                        
+      "result": "{\n  \"results\": [\n    {\n      \"s\": \"https://spec.edmcouncil.org/fibo/ontology/SEC/Funds/CollectiveInv
+    estmentVehicles/authorizedCountry\",\n      \"p\": \"http://www.w3.org/2000/01/rdf-schema#label\",\n      \"o\": \"author
+    … +96 lines (ctrl+o to expand)
+
+
+
+⏺ I found a reference to https://www.omg.org/spec/Commons/Locations/Country. Let me get more details about this class:
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos:
+                         <http://www.w3.org/2004/02/skos/core#>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\n\nSELECT ?p
+                         ?o\nWHERE {\n  <https://www.omg.org/spec/Commons/Locations/Country> ?p ?o .\n}")
+  ⎿  {                                                     
+       "result": "{\n  \"results\": [],\n  \"count\": 0\n}"
+     }
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos:
+                         <http://www.w3.org/2004/02/skos/core#>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\n\nSELECT DISTINCT
+                         ?class ?label ?definition\nWHERE {\n  ?class rdfs:subClassOf* ?parent .\n
+                         FILTER(CONTAINS(LCASE(STR(?class)), \"geopolitical\"))\n  OPTIONAL { ?class rdfs:label ?label }\n
+                         OPTIONAL { ?class skos:definition ?definition }\n}\nLIMIT 20")
+  ⎿ {                                                                                                                        
+      "result": "{\n  \"results\": [\n    {\n      \"class\": \"https://www.omg.org/spec/Commons/Locations/GeopoliticalEntity
+    \"\n    },\n    {\n      \"class\": \"This ontology provides a very high level definition of geographic region and geopol
+    … +23 lines (ctrl+o to expand)
+
+
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos:
+                         <http://www.w3.org/2004/02/skos/core#>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\n\nSELECT ?p
+                         ?o\nWHERE {\n  <https://www.omg.org/spec/Commons/Locations/GeopoliticalEntity> ?p ?o .\n}")
+  ⎿  {                                                     
+       "result": "{\n  \"results\": [],\n  \"count\": 0\n}"
+     }
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos:
+                         <http://www.w3.org/2004/02/skos/core#>\nPREFIX fibo-fnd-plc-cty:
+                         <https://spec.edmcouncil.org/fibo/ontology/FND/Places/Countries/>\n\nSELECT ?s ?label ?definition\nWHERE
+                         {\n  ?s rdfs:isDefinedBy fibo-fnd-plc-cty: .\n  OPTIONAL { ?s rdfs:label ?label }\n  OPTIONAL { ?s
+                         skos:definition ?definition }\n}\nLIMIT 30")
+  ⎿  {                                                     
+       "result": "{\n  \"results\": [],\n  \"count\": 0\n}"
+     }
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos:
+                         <http://www.w3.org/2004/02/skos/core#>\n\nSELECT DISTINCT ?class ?label ?definition\nWHERE {\n  ?class a
+                         <http://www.w3.org/2002/07/owl#Class> .\n  ?class rdfs:label ?label .\n
+                         FILTER(CONTAINS(LCASE(STR(?label)), \"geopolitical\") || CONTAINS(LCASE(STR(?label)), \"sovereign\"))\n
+                         OPTIONAL { ?class skos:definition ?definition }\n}\nLIMIT 20")
+  ⎿ {                                                                                                                        
+      "result": "{\n  \"results\": [\n    {\n      \"class\": \"https://spec.edmcouncil.org/fibo/ontology/SEC/Funds/Funds/Sov
+    ereignWealthFund\",\n      \"label\": \"sovereign wealth fund\",\n      \"definition\": \"state-owned investment fund tha
+    … +16 lines (ctrl+o to expand)
+
+
+
+⏺ Let me get more details on the SovereignState class which is closely related to "country":
+
+⏺ fibo-mcp - sparql (MCP)(query: "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX skos:
+                         <http://www.w3.org/2004/02/skos/core#>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\n\nSELECT ?p
+                         ?o\nWHERE {\n
+                         <https://spec.edmcouncil.org/fibo/ontology/BE/GovernmentEntities/GovernmentEntities/SovereignState> ?p ?o
+                          .\n}")
+  ⎿  {                                                                                                                       
+       "result": "{\n  \"results\": [\n    {\n      \"p\": \"http://www.w3.org/1999/02/22-rdf-syntax-ns#type\",\n      \"o\":
+     \"http://www.w3.org/2002/07/owl#Class\"\n    },\n    {\n      \"p\": \"http://www.w3.org/2000/01/rdf-schema#label\",\n
+     … +10 lines (ctrl+o to expand)
+
+⏺ Based on the FIBO (Financial Industry Business Ontology) ontology, here's what a country is:
+
+  In FIBO, the concept of country is represented through the SovereignState class:
+
+  Definition: A non-physical juridical entity that is represented by one centralized government that has sovereignty over a
+  geographic area.
+
+  Key characteristics:
+  - Represented by one centralized government
+  - Has a permanent population
+  - Has defined territory
+  - Has the capacity to enter into relations with other sovereign states
+
+  FIBO also defines related concepts:
+  - Federated Sovereignty - a polity characterized by a union of partially self-governing states or regions under a central
+  (federal) government
+  - Regional Sovereignty - an administrative division or country subdivision that can incur debt, issue contracts, and enter
+  into relations with similar entities
+
+  The ontology uses ISO 3166-1 country codes (via https://www.omg.org/spec/LCC/Countries/) to identify specific countries, and
+   properties like hasCountry, operatesInCountry, and hasHomeCountry to relate entities to countries.
