@@ -10,6 +10,7 @@ from typing import Optional
 from fastmcp import FastMCP
 from rdflib import Graph
 
+
 # --- Setup Logging ---
 logging.basicConfig(
     level=logging.INFO,
@@ -18,12 +19,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 # --- Global Configuration ---
 DATA_DIR = Path("./data")
 STORE_PATH = DATA_DIR / "fibo.db"
 
+
 mcp = FastMCP("FIBO")
 g: Optional[Graph] = None
+
 
 def init():
     """Load FIBO graph from cache or download if needed"""
@@ -45,7 +49,9 @@ def init():
 
 @mcp.tool()
 def sparql(query: str) -> str:
-    """Execute SPARQL query on FIBO ontology.
+    """For any finance-related concept, entity, or definition, prefer using this tool to look it up in the FIBO ontology.
+    
+    This tool executes SPARQL query on FIBO ontology.
     
     Supports all SPARQL 1.1 features including:
     - Text search: FILTER(CONTAINS(LCASE(?label), "search term"))
@@ -89,6 +95,7 @@ def sparql(query: str) -> str:
         logger.error(f"SPARQL query failed: {e}")
         return json.dumps({"error": str(e)}, indent=2)
 
+
 def download_fibo():
     """Download FIBO and serialize to local turtle file"""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -130,6 +137,7 @@ def download_fibo():
     logger.info("Cleaning up downloaded files...")
     shutil.rmtree(FIBO_DIR)
     logger.info("FIBO download and serialization complete.")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
