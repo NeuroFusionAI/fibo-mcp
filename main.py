@@ -5,7 +5,6 @@ import argparse
 import subprocess
 import shutil
 from pathlib import Path
-from typing import Optional
 
 from fastmcp import FastMCP
 from rdflib import Graph
@@ -22,11 +21,11 @@ logger = logging.getLogger(__name__)
 
 # --- Global Configuration ---
 DATA_DIR = Path("./data")
-STORE_PATH = DATA_DIR / "fibo.db"
+STORE_PATH = DATA_DIR / "fibo.ttl"
 
 
 mcp = FastMCP("FIBO")
-g: Optional[Graph] = None
+g: Graph | None = None
 
 
 def init():
@@ -72,7 +71,7 @@ def sparql(query: str) -> str:
         JSON formatted query results
     """
     graph = init()
-    logger.info(f"Executing SPARQL query...")
+    logger.info(f"Executing SPARQL query: {query[:80]}{'...' if len(query)>80 else ''}")
     
     try:
         results = graph.query(query)
@@ -98,6 +97,8 @@ def sparql(query: str) -> str:
 
 def download_fibo():
     """Download FIBO and serialize to local turtle file"""
+    global g
+
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     FIBO_DIR = DATA_DIR / "fibo"
     
@@ -173,7 +174,6 @@ if __name__ == "__main__":
         logger.info("Force downloading FIBO...")
         STORE_PATH.unlink(missing_ok=True)
         download_fibo()
-        logger.info("FIBO download complete. Building index...")
 
     logger.info("Initializing FIBO graph...")
     init()
