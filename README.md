@@ -72,6 +72,8 @@ Money's value ultimately rests on collective trust and acceptance.
 </td>
 <td valign="top">
 
+*Claude automatically queries FIBO...*
+
 According to FIBO:
 
 **Currency**: *"medium of exchange value, defined by reference to the geographical location of the monetary authorities responsible for it"*
@@ -80,8 +82,6 @@ FIBO distinguishes:
 - **Currency** - the medium of exchange itself
 - **Monetary Amount** - a quantity denominated in a currency
 - **Currency Identifier** - ISO 4217 codes (USD, EUR, etc.)
-
-Location: `fibo:FND/Accounting/CurrencyAmount/Currency`
 
 </td>
 </tr>
@@ -97,26 +97,63 @@ Location: `fibo:FND/Accounting/CurrencyAmount/Currency`
 <tr>
 <td valign="top">
 
-A country is a distinct political entity with:
+A country is a distinct territorial body or political entity with its own government, defined borders, and sovereignty.
+
+**Key characteristics:**
 - Defined territory
 - Permanent population
-- Sovereign government
-- Capacity to enter relations with other states
+- Government
+- Sovereignty
+- Recognition by other countries
 
-The terms "country," "nation," "state," and "nation-state" are often used interchangeably but have subtle differences.
+There are approximately 195 recognized countries today.
 
 </td>
 <td valign="top">
 
-According to FIBO:
+*Claude automatically queries FIBO...*
 
 **Sovereign State**: *"non-physical juridical entity that is represented by one centralized government that has sovereignty over a geographic area"*
 
-Key: A country is a **legal entity** (juridical person), not just a geographic area.
+Key characteristics from FIBO:
+- Represented by one centralized government
+- Has a permanent population
+- Has defined territory
+- Has capacity to enter into relations with other sovereign states
 
-Hierarchy: `SovereignState` → `Polity` → `LegalEntity`
+Related: **Federated Sovereignty**, **Regional Sovereignty**
 
-Location: `fibo:BE/GovernmentEntities/GovernmentEntities/SovereignState`
+</td>
+</tr>
+</table>
+
+### "What is corporate?"
+
+<table width="100%">
+<tr>
+<th width="50%">Claude Code</th>
+<th width="50%">Claude Code + fibo-mcp</th>
+</tr>
+<tr>
+<td valign="top">
+
+A corporation is a legal entity separate from its owners:
+
+- **Limited liability** - Owners not personally responsible for debts
+- **Perpetual existence** - Continues regardless of ownership changes
+- **Legal personhood** - Can own property, enter contracts, sue and be sued
+- **Transferable ownership** - Shares can be bought and sold
+
+</td>
+<td valign="top">
+
+*Claude automatically queries FIBO...*
+
+**Stock Corporation**: *"corporation that has shareholders, each of whom receives a portion of the ownership of the corporation through shares of stock"*
+
+**Contractually Capable Entity**: *"unique entity that is legally or financially responsible for the performance of financial transactions, or has the legal right in its jurisdiction to enter independently into legal contracts"*
+
+Formation: **Articles of Incorporation**, **Corporate Bylaws**
 
 </td>
 </tr>
