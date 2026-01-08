@@ -47,77 +47,82 @@ Add to your `claude_desktop_config.json`:
 
 Restart Claude Desktop to activate.
 
-## Example Result
+## Examples
+
+### "What is money?"
 
 <table width="100%">
-<thead>
 <tr>
 <th width="50%">Claude Code</th>
-<th width="50%">Claude Code + fibo-mcp </th>
+<th width="50%">Claude Code + fibo-mcp</th>
 </tr>
-</thead>
-<tbody>
 <tr>
-<td width="50%" valign="top">
+<td valign="top">
 
-> **"What is a country?"**
+Money is a medium of exchange, a store of value, and a unit of account that facilitates economic transactions.
 
-A country is a distinct political entity with several key characteristics:
+**Forms of Money:**
+- Commodity money - Physical items with intrinsic value (gold, silver)
+- Fiat money - Government-issued currency not backed by commodity (USD, EUR)
+- Digital/Electronic money - Bank deposits, digital payments
+- Cryptocurrencies - Decentralized digital assets like Bitcoin
 
-Core Elements:
-- Defined territory - A geographical area with recognized borders
-- Permanent population - People who reside within those borders
-- Sovereign government - An independent authority that exercises control over the territory and population
-- Capacity to enter relations with other states - The ability to engage in diplomatic and international relations
+Money's value ultimately rests on collective trust and acceptance.
 
-Additional aspects:
-- Countries typically have their own legal system, currency, and institutions
-- They may be recognized by other countries and international organizations (like the UN)
-- They exercise sovereignty - the supreme authority within their territory
-
-Note: The terms "country," "nation," "state," and "nation-state" are often used interchangeably but have subtle differences:
-  - Country - A general term for a geographical-political entity
-  - State - Emphasizes the political and governmental structure
-  - Nation - Refers to a group of people sharing common culture, language, or history
-  - Nation-state - When a nation and state align (one dominant cultural group in one political entity)
 </td>
-<td width="50%" valign="top">
+<td valign="top">
 
-> **"What is a country?"**
+According to FIBO:
 
-According to FIBO, a country is represented as a
-**Sovereign State**, which is defined as:
+**Currency**: *"medium of exchange value, defined by reference to the geographical location of the monetary authorities responsible for it"*
 
-A non-physical **juridical entity** that is represented by one **centralized government** that has **sovereignty** over a geographic area.
+FIBO distinguishes:
+- **Currency** - the medium of exchange itself
+- **Monetary Amount** - a quantity denominated in a currency
+- **Currency Identifier** - ISO 4217 codes (USD, EUR, etc.)
 
-The ontology provides additional clarification in an explanatory note:
+Location: `fibo:FND/Accounting/CurrencyAmount/Currency`
 
-A legal entity that is represented by one **centralized government**, has a **permanent population**, **defined territory**, and the **capacity to enter into relations with other sovereign states**.
-
-Key Characteristics:
-
-Legal entity status — It's a **juridical/legal person**
-
-Centralized government — Represented by one central governing authority
-
-Sovereignty — Has sovereign power over a defined area
-
-Geographic territory — Has defined territorial boundaries
-
-Permanent population — Has a stable population
-
-International capacity — Can enter into relations with other sovereign states
-
-In the FIBO ontology hierarchy, a **Sovereign State** is a specialized type of **Polity**, which is broadly defined as a legal person representing entities such as states, municipalities, or other civil authorities.
-
-The concept is located in:
-BE/GovernmentEntities/GovernmentEntities/SovereignState
 </td>
 </tr>
-</tbody>
 </table>
 
-**Why this matters:** Financial institutions need precise jurisdiction classification for regulatory compliance, cross-border transactions, sanctions screening, and legal entity identification (LEI). FIBO's structured definitions ensure consistent interpretation across systems and jurisdictions.
+### "What is a country?"
+
+<table width="100%">
+<tr>
+<th width="50%">Claude Code</th>
+<th width="50%">Claude Code + fibo-mcp</th>
+</tr>
+<tr>
+<td valign="top">
+
+A country is a distinct political entity with:
+- Defined territory
+- Permanent population
+- Sovereign government
+- Capacity to enter relations with other states
+
+The terms "country," "nation," "state," and "nation-state" are often used interchangeably but have subtle differences.
+
+</td>
+<td valign="top">
+
+According to FIBO:
+
+**Sovereign State**: *"non-physical juridical entity that is represented by one centralized government that has sovereignty over a geographic area"*
+
+Key: A country is a **legal entity** (juridical person), not just a geographic area.
+
+Hierarchy: `SovereignState` → `Polity` → `LegalEntity`
+
+Location: `fibo:BE/GovernmentEntities/GovernmentEntities/SovereignState`
+
+</td>
+</tr>
+</table>
+
+**Why this matters:** Financial institutions need precise definitions for regulatory compliance, cross-border transactions, sanctions screening, and legal entity identification (LEI). FIBO provides the industry-standard terminology.
 
 ## Remote Access with ngrok
 
