@@ -1,4 +1,3 @@
-import json
 import logging
 import argparse
 
@@ -8,7 +7,6 @@ import fibo
 from loader import get_graph
 
 
-# --- Setup Logging ---
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] - %(message)s",
@@ -31,16 +29,18 @@ def sparql(query: str) -> str:
     financial service provider, legal entity, sovereign state, currency,
     exchange, corporate action, occurrence, pool, collective investment vehicle
 
-    Returns BM25 suggestions when no results found - use these to refine your search.
+    Returns TOON format (compact, token-efficient). URIs use prefixes:
+    rdf, rdfs, owl, skos, cmns-av, fibo (e.g., fibo:BE/GovernmentEntities/...)
+
+    Always includes BM25 suggestions to help refine searches.
 
     Args:
         query: SPARQL 1.1 query. Use FILTER(CONTAINS(LCASE(?label), "term")) for search.
 
     Returns:
-        JSON with results array, count, and suggestions (if count=0)
+        TOON format with results array, count, and suggestions
     """
-    result = fibo.sparql(query)
-    return json.dumps(result, indent=2)
+    return fibo.sparql(query)
 
 
 if __name__ == "__main__":

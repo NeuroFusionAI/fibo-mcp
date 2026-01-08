@@ -7,6 +7,7 @@ dependencies = [
   "google-generativeai>=0.8.6",
   "rank-bm25>=0.2.2",
   "rdflib>=7.0.0",
+  "toon-format",
 ]
 
 [project.optional-dependencies]
@@ -32,3 +33,6 @@ pgm = [
   "tqdm>=4.60.0",
   "funsor>=0.4.5",
 ]
+
+[tool.uv.sources]
+toon-format = { git = "https://github.com/toon-format/toon-python.git" }

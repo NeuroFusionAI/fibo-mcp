@@ -1,10 +1,8 @@
-import pytest
 import fibo
 from loader import get_graph
 
 
 def test_sparql_basic_query():
-    """Test basic SPARQL query"""
     query = """
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     SELECT ?label WHERE {
@@ -12,13 +10,11 @@ def test_sparql_basic_query():
     } LIMIT 5
     """
     result = fibo.sparql(query)
-    assert "results" in result
-    assert len(result["results"]) <= 5
-    assert "count" in result
+    assert "results[" in result
+    assert "count:" in result
 
 
 def test_sparql_text_search():
-    """Test SPARQL text search for country-related concepts"""
     query = """
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -30,12 +26,11 @@ def test_sparql_text_search():
     } LIMIT 10
     """
     result = fibo.sparql(query)
-    assert "results" in result
-    # Should find currency-related concepts in FIBO
+    assert "results[" in result
+    assert "suggestions[" in result
 
 
 def test_sparql_property_paths():
-    """Test SPARQL property paths for traversal"""
     query = """
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -45,11 +40,10 @@ def test_sparql_property_paths():
     } LIMIT 10
     """
     result = fibo.sparql(query)
-    assert "results" in result
+    assert "results[" in result
 
 
 def test_sparql_aggregation():
-    """Test SPARQL aggregation functions"""
     query = """
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -59,20 +53,27 @@ def test_sparql_aggregation():
     }
     """
     result = fibo.sparql(query)
-    assert "results" in result
-    if len(result["results"]) > 0:
-        assert "total" in result["results"][0]
+    assert "results[" in result
+    assert "total" in result
 
 
 def test_sparql_invalid_query():
-    """Test handling of invalid SPARQL query"""
     query = "INVALID SPARQL SYNTAX"
     result = fibo.sparql(query)
-    assert "error" in result
+    assert "error:" in result
+
+
+def test_sparql_prefix_compression():
+    query = """
+    SELECT ?p ?v WHERE {
+        <https://spec.edmcouncil.org/fibo/ontology/BE/GovernmentEntities/GovernmentEntities/SovereignState> ?p ?v
+    }
+    """
+    result = fibo.sparql(query)
+    assert "rdfs:" in result or "owl:" in result or "fibo:" in result
 
 
 def test_graph_initialization():
-    """Test that graph initializes properly"""
     g = get_graph()
     assert g is not None
-    assert len(g) > 0  # Should have triples loaded
+    assert len(g) > 0

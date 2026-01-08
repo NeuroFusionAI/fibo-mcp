@@ -2,9 +2,32 @@ import logging
 import re
 from typing import Any
 
+from toon_format import encode as toon_encode
+
 from loader import get_graph
 
 logger = logging.getLogger(__name__)
+
+PREFIXES = {
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#": "rdf:",
+    "http://www.w3.org/2000/01/rdf-schema#": "rdfs:",
+    "http://www.w3.org/2002/07/owl#": "owl:",
+    "http://www.w3.org/2004/02/skos/core#": "skos:",
+    "https://www.omg.org/spec/Commons/AnnotationVocabulary/": "cmns-av:",
+    "https://spec.edmcouncil.org/fibo/ontology/": "fibo:",
+}
+
+
+def _compact_uri(uri: str) -> str:
+    for full, prefix in PREFIXES.items():
+        if uri.startswith(full):
+            return prefix + uri[len(full) :]
+    return uri
+
+
+def _compact_result(row: dict[str, str]) -> dict[str, str]:
+    return {k: _compact_uri(v) for k, v in row.items()}
+
 
 _bm25_index = None
 _docs_data = None
@@ -59,7 +82,7 @@ def fuzzy_search(term: str, top_k: int = 5) -> list[dict[str, Any]]:
     ]
 
 
-def sparql(query: str) -> dict[str, Any]:
+def sparql(query: str) -> str:
     graph = get_graph()
     logger.info(
         f"Executing SPARQL query: {query[:80]}{'...' if len(query) > 80 else ''}"
@@ -70,11 +93,13 @@ def sparql(query: str) -> dict[str, Any]:
         output = []
         for row in results:
             output.append(
-                {
-                    str(var): str(row[var])
-                    for var in results.vars
-                    if row[var] is not None
-                }
+                _compact_result(
+                    {
+                        str(var): str(row[var])
+                        for var in results.vars
+                        if row[var] is not None
+                    }
+                )
             )  # type: ignore
 
         logger.info(f"SPARQL query returned {len(output)} results.")
@@ -87,8 +112,8 @@ def sparql(query: str) -> dict[str, Any]:
                 f"Added {len(result['suggestions'])} BM25 suggestions for '{term}'"
             )
 
-        return result
+        return toon_encode(result)
 
     except Exception as e:
         logger.error(f"SPARQL query failed: {e}")
-        return {"error": str(e)}
+        return toon_encode({"error": str(e)})
