@@ -10,7 +10,12 @@ FIBO[1] is the industry-standard financial ontology covering currencies, securit
 
 ## Installation
 
-### Claude Code
+### For Claude Code
+
+Copy-and-paste below instruction into claude code
+```
+install https://github.com/NeuroFusionAI/fibo-mcp?tab=readme-ov-file#claude-code
+```
 
 1. Clone and install dependencies:
 ```bash
