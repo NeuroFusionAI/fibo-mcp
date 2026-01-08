@@ -4,7 +4,7 @@ Give your financial agent access to the Financial Industry Business Ontology (FI
 
 ## What is FIBO?
 
-[FIBO](https://spec.edmcouncil.org/fibo/) is the industry-standard financial ontology covering currencies, securities, derivatives, markets, legal entities, and business concepts.
+FIBO[^1] is the industry-standard financial ontology covering currencies, securities, derivatives, markets, legal entities, and business concepts.
 
 <img src="assets/fibo_graph.png" alt="FIBO Graph Visualization" width="500">
 
@@ -161,7 +161,7 @@ Formation: **Articles of Incorporation**, **Corporate Bylaws**
 
 **Why this matters:** Finance has a semantics problem—the same "trade," "counterparty," or "position" can mean different things across desks, systems, vendors, and jurisdictions. FIBO provides a formal, machine-readable ontology (OWL/RDF) so data from contracts, market feeds, and internal systems can be integrated and queried with shared meaning. This reduces mapping/reconciliation work and improves auditability for risk and regulatory reporting.
 
-Used by: Citigroup, Deutsche Bank, Goldman Sachs, State Street, Wells Fargo, CFTC, US Treasury OFR, and others. Standardized by EDM Council and OMG.
+Contributors include Citigroup, Deutsche Bank, Goldman Sachs, State Street, Wells Fargo, CFTC, US Treasury OFR, and others[^1]. Standardized by EDM Council and OMG.
 
 ## Remote Access with ngrok
 
@@ -203,3 +203,7 @@ resp = client.responses.create(
 - **Coverage**: 3,371 classes, 16,057 labeled entities, 1,259 properties
 - **Cache**: Turtle format at `./data/fibo.ttl` (auto-downloaded on first run)
 - **Updates**: `uv run main.py --force-download` to get latest FIBO
+
+## References
+
+[^1]: [FIBO - Financial Industry Business Ontology](https://spec.edmcouncil.org/fibo/), EDM Council
