@@ -32,7 +32,7 @@ claude mcp add fibo-mcp -s user -- uv run --directory $(pwd) main.py
 
 ### Claude Desktop
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+Add to your `claude_desktop_config.json`:
 
 ```json
 {
