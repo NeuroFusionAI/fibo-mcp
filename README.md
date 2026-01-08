@@ -12,23 +12,19 @@ FIBO[1] is the industry-standard financial ontology covering currencies, securit
 
 ### Claude Code
 
-Just paste this URL into Claude Code and ask it to install:
-
-```
-https://github.com/NeuroFusionAI/fibo-mcp
-```
-
-Claude will clone the repo, run `uv sync`, and add the MCP server. **Restart Claude Code to activate.**
-
-### Manual Installation
-
+1. Clone and install dependencies:
 ```bash
 git clone https://github.com/NeuroFusionAI/fibo-mcp.git
 cd fibo-mcp
 uv sync
-claude mcp add fibo-mcp -s user -- uv run --directory $(pwd) main.py
-# Restart Claude Code to activate
 ```
+
+2. Add the MCP server:
+```bash
+claude mcp add --scope user fibo-mcp -- uv run --directory $PWD main.py
+```
+
+3. **Restart Claude Code to activate**
 
 ### Development Installation
 
