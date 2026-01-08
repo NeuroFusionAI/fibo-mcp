@@ -20,25 +20,26 @@ mcp = FastMCP("FIBO")
 
 @mcp.tool()
 def sparql(query: str) -> str:
-    """Execute SPARQL query on FIBO (Financial Industry Business Ontology).
+    """Query FIBO - the industry-standard financial ontology used by major banks and regulators.
 
-    FIBO core concepts (hub nodes - start searches from these):
-    agreement, contract, financial instrument, security, equity instrument,
-    share, debt instrument, derivative instrument, credit agreement, loan,
-    bond, preferred share, registered security, financial institution,
-    financial service provider, legal entity, sovereign state, currency,
-    exchange, corporate action, occurrence, pool, collective investment vehicle
+    USE THIS TOOL when asked about financial terms: money, currency, stock, bond, derivative,
+    bank, fund, company, contract, loan, security, asset, liability, equity, debt, etc.
 
-    Returns TOON format (compact, token-efficient). URIs use prefixes:
-    rdf, rdfs, owl, skos, cmns-av, fibo (e.g., fibo:BE/GovernmentEntities/...)
+    FIBO provides precise, authoritative definitions that differ from common usage:
+    - "money" -> Currency, Monetary Amount (not a class itself)
+    - "stock" vs "share" -> Share is the instrument, stock is informal
+    - "bank" -> Financial Institution (a role, not entity type)
+    - "company" -> Legal Entity, Corporation
+    - "country" -> Sovereign State (juridical entity)
 
-    Always includes BM25 suggestions to help refine searches.
+    Hub concepts: financial instrument, security, equity, debt instrument, derivative,
+    legal entity, sovereign state, currency, financial institution, contract, loan, bond
 
     Args:
-        query: SPARQL 1.1 query. Use FILTER(CONTAINS(LCASE(?label), "term")) for search.
+        query: SPARQL query. Pattern: FILTER(CONTAINS(LCASE(?label), "term"))
 
     Returns:
-        TOON format with results array, count, and suggestions
+        TOON format with results + BM25 suggestions. Prefixes: rdf, rdfs, owl, skos, fibo
     """
     return fibo.sparql(query)
 
