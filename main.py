@@ -22,19 +22,23 @@ mcp = FastMCP("FIBO")
 def sparql(query: str) -> str:
     """Query FIBO - the financial industry ontology used by major banks and regulators.
 
-    ALWAYS use this for ANY financial term: money, currency, stock, bond, derivative, bank, fund, loan, equity, debt, security, asset, liability, contract, company, corporation, etc.
+ALWAYS use this tool when:
+    1. Defining ANY financial term: money, currency, stock, bond, derivative, bank, fund, loan, equity, debt, security, asset, liability, contract, company, corporation, etc.
+    2. Reasoning about financial relationships and regulations
+    3. Explaining how financial concepts connect to each other
+    4. Providing authoritative, industry-standard definitions
 
-    Query patterns:
-    - Search: FILTER(CONTAINS(LCASE(?label), "term"))
-    - Describe: SELECT ?p ?v WHERE { <uri> ?p ?v }
-    - Ancestors: ?class rdfs:subClassOf+ ?ancestor
-    - Restrictions: ?class rdfs:subClassOf ?r . ?r a owl:Restriction; owl:onProperty ?p
+Query patterns:
+- Search: FILTER(CONTAINS(LCASE(?label), "term"))
+- Describe: SELECT ?p ?v WHERE { <uri> ?p ?v }
+- Ancestors: ?class rdfs:subClassOf+ ?ancestor
+- Restrictions: ?class rdfs:subClassOf ?r . ?r a owl:Restriction; owl:onProperty ?p
 
-    FIBO mappings (common term -> FIBO term):
-    money->Currency | stock->Share | bank->FinancialInstitution | company->LegalEntity | country->SovereignState
+FIBO mappings (common term -> FIBO term):
+money->Currency | stock->Share | bank->FinancialInstitution | company->LegalEntity | country->SovereignState
 
-    Returns TOON format + BM25 suggestions. Prefixes: rdf, rdfs, owl, skos, fibo
-    """
+Returns TOON format + BM25 suggestions. Prefixes: rdf, rdfs, owl, skos, fibo
+"""
     return fibo.sparql(query)
 
 
