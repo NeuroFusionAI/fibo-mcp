@@ -8,21 +8,26 @@ Give your financial agent access to the Financial Industry Business Ontology (FI
 
 <img src="assets/fibo_graph.png" alt="FIBO Graph Visualization" width="500">
 
-## Quick Start
+## Installation
 
-### Claude Code (Local)
+### Claude Code
+
+Just paste this URL into Claude Code and ask it to install:
+
+```
+https://github.com/NeuroFusionAI/fibo-mcp
+```
+
+Claude will clone the repo, run `uv sync`, and add the MCP server. **Restart Claude Code to activate.**
+
+### Manual Installation
 
 ```bash
-# Clone and install
-git clone https://github.com/NeurofusionAI/fibo-mcp.git
+git clone https://github.com/NeuroFusionAI/fibo-mcp.git
 cd fibo-mcp
 uv sync
-
-# Add to Claude Code
-claude mcp add fibo-mcp -s user -- uv run --directory /path/to/fibo-mcp main.py
-
-# Verify installation
-claude mcp list
+claude mcp add fibo-mcp -s user -- uv run --directory $(pwd) main.py
+# Restart Claude Code to activate
 ```
 
 ### Claude Desktop
@@ -39,6 +44,8 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
   }
 }
 ```
+
+Restart Claude Desktop to activate.
 
 ## Example Result
 
