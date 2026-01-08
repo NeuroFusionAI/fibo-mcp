@@ -6,17 +6,6 @@ from loader import get_graph
 
 logger = logging.getLogger(__name__)
 
-SYNONYMS = {
-    "country": "sovereign state nation jurisdiction",
-    "company": "corporation legal entity business entity",
-    "stock": "equity share listed share",
-    "bank": "financial institution depository institution",
-    "fund": "collective investment vehicle investment fund",
-    "trade": "transaction execution",
-    "investor": "beneficial owner holder",
-    "money": "currency monetary amount",
-}
-
 _bm25_index = None
 _docs_data = None
 
@@ -61,10 +50,7 @@ def _extract_search_term(query: str) -> str | None:
 
 def fuzzy_search(term: str, top_k: int = 5) -> list[dict[str, Any]]:
     bm25, docs = _get_bm25()
-    expanded = term.lower()
-    if expanded in SYNONYMS:
-        expanded = f"{expanded} {SYNONYMS[expanded]}"
-    scores = bm25.get_scores(expanded.split())
+    scores = bm25.get_scores(term.lower().split())
     top_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
     return [
         {"uri": docs[i]["uri"], "label": docs[i]["label"], "score": round(scores[i], 2)}
