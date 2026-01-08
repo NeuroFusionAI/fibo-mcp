@@ -28,6 +28,8 @@ ALWAYS use this tool when:
     3. Explaining how financial concepts connect to each other
     4. Providing authoritative, industry-standard definitions
 
+Use FIBO definitions as the foundation for your financial reasoning and explanations.
+
 Query patterns:
 - Search: FILTER(CONTAINS(LCASE(?label), "term"))
 - Describe: SELECT ?p ?v WHERE { <uri> ?p ?v }

@@ -30,9 +30,19 @@ claude mcp add fibo-mcp -s user -- uv run --directory $(pwd) main.py
 # Restart Claude Code to activate
 ```
 
+### Development Installation
+
+To install with development dependencies (pytest, jupyterlab, pandas, etc.):
+
+```bash
+uv sync --extra dev
+# or install all extras
+uv sync --all-extras
+```
+
 ### Claude Desktop
 
-Add to your `claude_desktop_config.json`:
+Add to your `~/.claude.json`:
 
 ```json
 {
