@@ -31,12 +31,7 @@ def sparql(query: str) -> str:
     financial service provider, legal entity, sovereign state, currency,
     exchange, corporate action, occurrence, pool, collective investment vehicle
 
-    Common term → FIBO term:
-    country → sovereign state | company → legal entity | stock → share/equity
-    bank → financial institution | fund → collective investment vehicle
-    trade → transaction | investor → beneficial owner | money → currency
-
-    Returns BM25 suggestions when no results found.
+    Returns BM25 suggestions when no results found - use these to refine your search.
 
     Args:
         query: SPARQL 1.1 query. Use FILTER(CONTAINS(LCASE(?label), "term")) for search.
