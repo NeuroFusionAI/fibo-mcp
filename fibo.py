@@ -80,13 +80,12 @@ def sparql(query: str) -> dict[str, Any]:
         logger.info(f"SPARQL query returned {len(output)} results.")
         result: dict[str, Any] = {"results": output, "count": len(output)}
 
-        if len(output) == 0:
-            term = _extract_search_term(query)
-            if term:
-                result["suggestions"] = fuzzy_search(term, top_k=5)
-                logger.info(
-                    f"No results, added {len(result['suggestions'])} fuzzy suggestions for '{term}'"
-                )
+        term = _extract_search_term(query)
+        if term:
+            result["suggestions"] = fuzzy_search(term, top_k=10)
+            logger.info(
+                f"Added {len(result['suggestions'])} BM25 suggestions for '{term}'"
+            )
 
         return result
 
