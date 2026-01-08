@@ -37,8 +37,8 @@ Query patterns:
 FIBO mappings (common term -> FIBO term):
 money->Currency | stock->Share | bank->FinancialInstitution | company->LegalEntity | country->SovereignState
 
-Returns TOON format + BM25 suggestions. Prefixes: rdf, rdfs, owl, skos, fibo
-"""
+Returns TOON format + BM25 suggestions. Prefixes: rdf, rdfs, owl, skos, fibo"""
+    
     return fibo.sparql(query)
 
 
