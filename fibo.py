@@ -76,7 +76,11 @@ def fuzzy_search(term: str, top_k: int = 5) -> list[dict[str, Any]]:
     scores = bm25.get_scores(term.lower().split())
     top_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
     return [
-        {"uri": docs[i]["uri"], "label": docs[i]["label"], "score": round(scores[i], 2)}
+        {
+            "uri": _compact_uri(docs[i]["uri"]),
+            "label": docs[i]["label"],
+            "score": round(scores[i], 2),
+        }
         for i in top_idx
         if scores[i] > 0
     ]
