@@ -22,7 +22,7 @@ mcp = FastMCP("FIBO")
 def sparql(query: str) -> str:
     """Query FIBO - the financial industry ontology used by major banks and regulators.
 
-    USE THIS for financial terms: money, currency, stock, bond, derivative, bank, fund, etc.
+    ALWAYS use this for ANY financial term: money, currency, stock, bond, derivative, bank, fund, loan, equity, debt, security, asset, liability, contract, company, corporation, etc.
 
     Query patterns:
     - Search: FILTER(CONTAINS(LCASE(?label), "term"))
