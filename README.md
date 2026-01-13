@@ -31,16 +31,9 @@ When installing via Claude Code, ask user:
 > - [ ] Project scope only (default - already in .claude/skills/)
 > - [ ] User scope (all projects) - copy to ~/.claude/skills/
 
-> **Auto-allow fibo-mcp tool calls?**
-> - [ ] Yes - always allow without confirmation
-> - [ ] No - ask each time (default)
-
 ```bash
 # User scope skill (optional)
 cp -r .claude/skills/diagramming-expert ~/.claude/skills/
-
-# Auto-allow fibo-mcp (optional)
-claude mcp add-permission --scope user fibo-mcp "mcp__fibo-mcp__sparql"
 ```
 
 ### Other MCP Clients (Cursor, Claude Desktop, etc.)
