@@ -1,49 +1,39 @@
 # fibo-mcp
 
-Give your financial agent access to the Financial Industry Business Ontology (FIBO)
-
-## What is FIBO?
-
-FIBO[1] is the industry-standard financial ontology covering currencies, securities, derivatives, markets, legal entities, and business concepts.
+Give your financial agent access to the Financial Industry Business Ontology (FIBO).
 
 <img src="assets/fibo_graph.png" alt="FIBO Graph Visualization" width="500">
 
 ## Installation
 
-### For Claude Code
-
-Copy-and-paste below instruction into claude code
-```
-install https://github.com/NeuroFusionAI/fibo-mcp?tab=readme-ov-file#claude-code
-```
-
-1. Clone and install dependencies:
 ```bash
 git clone https://github.com/NeuroFusionAI/fibo-mcp.git
 cd fibo-mcp
 uv sync
+
+# Claude Code
+claude mcp add --scope user fibo-mcp -- uv run --directory "$(pwd)" main.py
+
+# Restart Claude Code to load the MCP
 ```
 
-2. Add the MCP server:
+### Diagramming Skill
+
+The repo includes a diagramming skill (`.claude/skills/diagramming-expert/`) for ASCII visualizations.
+
+When installing via Claude Code, ask user:
+> Where should I install the diagramming skill?
+> - [ ] Project scope only (default - already in .claude/skills/)
+> - [ ] User scope (all projects) - copy to ~/.claude/skills/
+
 ```bash
-claude mcp add --scope user fibo-mcp -- uv run --directory $PWD main.py
+# User scope (optional)
+cp -r .claude/skills/diagramming-expert ~/.claude/skills/
 ```
 
-3. **Restart Claude Code to activate**
+### Other MCP Clients (Cursor, Claude Desktop, etc.)
 
-### Development Installation
-
-To install with development dependencies (pytest, jupyterlab, pandas, etc.):
-
-```bash
-uv sync --extra dev
-# or install all extras
-uv sync --all-extras
-```
-
-### Claude Desktop
-
-Add to your `~/.claude.json`:
+Add to your MCP config file:
 
 ```json
 {
@@ -56,7 +46,15 @@ Add to your `~/.claude.json`:
 }
 ```
 
-Restart Claude Desktop to activate.
+### Uninstall
+
+```bash
+# Claude Code
+claude mcp remove fibo-mcp
+
+# Remove user-scope skill (if installed)
+rm -rf ~/.claude/skills/diagramming-expert
+```
 
 ## Examples
 
@@ -64,8 +62,8 @@ Restart Claude Desktop to activate.
 
 <table width="100%">
 <tr>
-<th width="50%">Claude Code</th>
-<th width="50%">Claude Code + fibo-mcp</th>
+<th width="50%">Without fibo-mcp</th>
+<th width="50%">With fibo-mcp</th>
 </tr>
 <tr>
 <td valign="top">
@@ -102,8 +100,8 @@ FIBO distinguishes:
 
 <table width="100%">
 <tr>
-<th width="50%">Claude Code</th>
-<th width="50%">Claude Code + fibo-mcp</th>
+<th width="50%">Without fibo-mcp</th>
+<th width="50%">With fibo-mcp</th>
 </tr>
 <tr>
 <td valign="top">
@@ -142,8 +140,8 @@ Related: **Federated Sovereignty**, **Regional Sovereignty**
 
 <table width="100%">
 <tr>
-<th width="50%">Claude Code</th>
-<th width="50%">Claude Code + fibo-mcp</th>
+<th width="50%">Without fibo-mcp</th>
+<th width="50%">With fibo-mcp</th>
 </tr>
 <tr>
 <td valign="top">
@@ -170,51 +168,48 @@ Formation: **Articles of Incorporation**, **Corporate Bylaws**
 </tr>
 </table>
 
-**Why this matters:** Finance has a semantics problem—the same "trade," "counterparty," or "position" can mean different things across desks, systems, vendors, and jurisdictions. FIBO provides a formal, machine-readable ontology (OWL/RDF) so data from contracts, market feeds, and internal systems can be integrated and queried with shared meaning. This reduces mapping/reconciliation work and improves auditability for risk and regulatory reporting.
+## Why FIBO?
 
-Contributors include Citigroup, Deutsche Bank, Goldman Sachs, State Street, Wells Fargo, CFTC, US Treasury OFR, and others[1]. Standardized by EDM Council and OMG.
+Finance has a semantics problem—the same "trade," "counterparty," or "position" can mean different things across desks, systems, vendors, and jurisdictions. FIBO provides a formal, machine-readable ontology (OWL/RDF) so data from contracts, market feeds, and internal systems can be integrated and queried with shared meaning.
 
-## Remote Access with ngrok
+Contributors include Citigroup, Deutsche Bank, Goldman Sachs, State Street, Wells Fargo, CFTC, US Treasury OFR, and others. Standardized by EDM Council and OMG.
+
+## Remote MCP (OpenAI, etc.)
 
 ```bash
-# 1. Start FIBO MCP server
+# Start HTTP server
 uv run main.py --http --port 8000
 
-# 2. In another terminal, expose via ngrok
+# Expose via ngrok (in another terminal)
 ngrok http 8000
-
-# 3. Use the ngrok URL (e.g., https://abc123.ngrok.io)
 ```
-
-### OpenAI API Integration
 
 ```python
 from openai import OpenAI
 
 client = OpenAI()
-
-# Configure FIBO MCP as a tool
 resp = client.responses.create(
-    model="gpt-5",
-    tools=[
-        {
-            "type": "mcp",
-            "server_label": "fibo",
-            "server_url": "https://your-ngrok-url.ngrok.io/mcp",  # Your ngrok URL
-            "require_approval": "never",
-        },
-    ],
-    input="What is a corporate according to FIBO?",
+    model="gpt-5.2",
+    tools=[{
+        "type": "mcp",
+        "server_label": "fibo",
+        "server_url": "https://your-ngrok-url.ngrok.io/mcp",
+        "require_approval": "never",
+    }],
+    input="What is a derivative according to FIBO?",
 )
 ```
 
 ## Technical Details
 
-- **Data**: 129,990 triples from FIBO ontology (299 RDF/OWL files)
-- **Coverage**: 3,371 classes, 16,057 labeled entities, 1,259 properties
-- **Cache**: Turtle format at `./data/fibo.ttl` (auto-downloaded on first run)
-- **Updates**: `uv run main.py --force-download` to get latest FIBO
+| | |
+|---|---|
+| Data | 129,990 triples (299 RDF/OWL files) |
+| Coverage | 3,371 classes, 16,057 entities, 1,259 properties |
+| Cache | `./data/fibo.ttl` (auto-downloaded on first run) |
+| Update | `uv run main.py --force-download` |
 
 ## References
 
-[1] https://spec.edmcouncil.org/fibo
+- [FIBO Specification](https://spec.edmcouncil.org/fibo)
+- [Diagramming Skill](https://github.com/erichowens/some_claude_skills/tree/main/.claude/skills/diagramming-expert)

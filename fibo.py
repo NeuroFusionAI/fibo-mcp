@@ -2,7 +2,7 @@ import logging
 import re
 from typing import Any
 
-from toon_format import encode as toon_encode
+from toon_format import encode
 
 from loader import get_graph
 
@@ -125,16 +125,16 @@ def sparql(query: str) -> str:
                 f"Added {len(result['suggestions'])} BM25 suggestions for '{term}'"
             )
 
-        return toon_encode(result)
+        return encode(result)
 
     except Exception as e:
         logger.error(f"SPARQL query failed: {e}")
-        return toon_encode({"error": str(e)})
+        return encode({"error": str(e)})
 
 
 def search(term: str) -> str:
     results = fuzzy_search(term, top_k=10)
-    return toon_encode({"results": results, "count": len(results)})
+    return encode({"results": results, "count": len(results)})
 
 
 def describe(uri: str) -> str:
@@ -163,11 +163,11 @@ def describe(uri: str) -> str:
             _compact_result({str(v): str(r[v]) for v in results.vars if r[v]})
             for r in results
         ]  # type: ignore
-        return toon_encode(
+        return encode(
             {"uri": _compact_uri(full_uri), "results": output, "count": len(output)}
         )
     except Exception as e:
-        return toon_encode({"error": str(e)})
+        return encode({"error": str(e)})
 
 
 def restrictions(uri: str) -> str:
@@ -193,7 +193,7 @@ def restrictions(uri: str) -> str:
             _compact_result({str(v): str(r[v]) for v in results.vars if r[v]})
             for r in results
         ]  # type: ignore
-        return toon_encode(
+        return encode(
             {
                 "uri": _compact_uri(full_uri),
                 "restrictions": output,
@@ -201,4 +201,4 @@ def restrictions(uri: str) -> str:
             }
         )
     except Exception as e:
-        return toon_encode({"error": str(e)})
+        return encode({"error": str(e)})

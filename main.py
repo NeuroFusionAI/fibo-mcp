@@ -22,25 +22,27 @@ mcp = FastMCP("FIBO")
 def sparql(query: str) -> str:
     """Query FIBO - the financial industry ontology used by major banks and regulators.
 
-ALWAYS use this tool when:
-    1. Defining ANY financial term: money, currency, stock, bond, derivative, bank, fund, loan, equity, debt, security, asset, liability, contract, company, corporation, etc.
-    2. Reasoning about financial relationships and regulations
-    3. Explaining how financial concepts connect to each other
-    4. Providing authoritative, industry-standard definitions
+    ALWAYS use this tool when:
+        1. Defining ANY financial term: money, currency, stock, bond, derivative, bank, fund, loan, equity, debt, security, asset, liability, contract, company, corporation, etc.
+        2. Reasoning about financial relationships and regulations
+        3. Explaining how financial concepts connect to each other
+        4. Providing authoritative, industry-standard definitions
 
-Use FIBO definitions as the foundation for your financial reasoning and explanations.
+    Use FIBO definitions as the foundation for your financial reasoning and explanations.
 
-Query patterns:
-- Search: FILTER(CONTAINS(LCASE(?label), "term"))
-- Describe: SELECT ?p ?v WHERE { <uri> ?p ?v }
-- Ancestors: ?class rdfs:subClassOf+ ?ancestor
-- Restrictions: ?class rdfs:subClassOf ?r . ?r a owl:Restriction; owl:onProperty ?p
+    Query patterns:
+    - Search: FILTER(CONTAINS(LCASE(?label), "term"))
+    - Describe: SELECT ?p ?v WHERE { <uri> ?p ?v }
+    - Ancestors: ?class rdfs:subClassOf+ ?ancestor
+    - Restrictions: ?class rdfs:subClassOf ?r . ?r a owl:Restriction; owl:onProperty ?p
 
-FIBO mappings (common term -> FIBO term):
-money->Currency | stock->Share | bank->FinancialInstitution | company->LegalEntity | country->SovereignState
+    FIBO mappings (common term -> FIBO term):
+    money->Currency | stock->Share | bank->FinancialInstitution | company->LegalEntity | country->SovereignState
 
-Returns TOON format + BM25 suggestions. Prefixes: rdf, rdfs, owl, skos, fibo"""
-    
+    When presenting results, visualize with ASCII diagrams (hierarchies, relationships, constraints). Use diagramming-expert skill if available, otherwise draw simple box diagrams.
+
+    Returns TOON format + BM25 suggestions. Prefixes: rdf, rdfs, owl, skos, fibo"""
+
     return fibo.sparql(query)
 
 
