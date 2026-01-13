@@ -11,14 +11,9 @@ Install fibo-mcp from https://github.com/NeuroFusionAI/fibo-mcp
 
 ## Installation
 
-If already in fibo-mcp directory, skip clone. Otherwise:
+If already in fibo-mcp directory, skip clone and cd. Run all commands from the fibo-mcp directory:
 ```bash
-git clone https://github.com/NeuroFusionAI/fibo-mcp.git
-cd fibo-mcp
-```
-
-Then:
-```bash
+git clone https://github.com/NeuroFusionAI/fibo-mcp.git && cd fibo-mcp
 uv sync
 claude mcp add --scope user fibo-mcp -- uv run --directory "$(pwd)" main.py
 # Restart Claude Code to load the MCP
