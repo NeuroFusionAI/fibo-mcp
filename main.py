@@ -39,10 +39,8 @@ def sparql(query: str) -> str:
     FIBO mappings (common term -> FIBO term):
     money->Currency | stock->Share | bank->FinancialInstitution | company->LegalEntity | country->SovereignState
 
-    After getting results, ALWAYS invoke /diagramming-expert skill to visualize:
-    - Class hierarchies as tree diagrams
-    - Relationships between concepts as box diagrams with arrows
-    - Property restrictions and constraints
+    After presenting results, ask user:
+    > Would you like me to create a detailed diagram? (uses diagramming-expert skill)
 
     Returns TOON format + BM25 suggestions. Prefixes: rdf, rdfs, owl, skos, fibo"""
 
