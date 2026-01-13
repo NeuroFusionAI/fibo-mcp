@@ -26,17 +26,17 @@ claude mcp add --scope user fibo-mcp -- uv run --directory "$(pwd)" main.py
 
 ### Diagramming Skill
 
-The repo includes a diagramming skill (`.claude/skills/diagramming-expert/`) for ASCII visualizations.
+The repo includes a diagramming skill (`.claude/skills/diagramming_expert/`) for ASCII visualizations.
 
 When installing via Claude Code, ask user:
 
 > **Diagramming skill scope:**
 > - [ ] Project scope only (default - already in .claude/skills/)
-> - [ ] User scope (all projects) - copy to ~/.claude/skills/diagramming-expert/
+> - [ ] User scope (all projects) - copy to ~/.claude/skills/
 
 ```bash
-# User scope skill (optional) - creates ~/.claude/skills/diagramming-expert/
-mkdir -p ~/.claude/skills && cp -r .claude/skills/diagramming-expert ~/.claude/skills/
+# User scope skill (optional)
+cp -r .claude/skills/diagramming_expert ~/.claude/skills/
 ```
 
 ### Other MCP Clients (Cursor, Claude Desktop, etc.)
