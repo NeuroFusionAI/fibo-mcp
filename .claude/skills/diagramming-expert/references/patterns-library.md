@@ -1,3 +1,8 @@
+---
+title: Diagram Patterns Library
+sidebar_label: Diagram Patterns Library
+sidebar_position: 2
+---
 # Diagram Patterns Library
 
 Ready-to-use patterns for common diagram needs.
@@ -426,6 +431,8 @@ Steps:    [✓] Step 1    [✓] Step 2    [▶] Step 3    [ ] Step 4
 ```
 
 ---
+
+## ANNOTATION PATTERNS
 
 ### Inline Annotations
 

@@ -1,3 +1,8 @@
+---
+title: Diagram Types Taxonomy
+sidebar_label: Diagram Types Taxonomy
+sidebar_position: 2
+---
 # Diagram Types Taxonomy
 
 Complete reference for choosing and creating the right diagram type.

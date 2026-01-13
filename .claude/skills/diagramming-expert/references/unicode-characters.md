@@ -1,3 +1,8 @@
+---
+title: Unicode Box Drawing Characters
+sidebar_label: Unicode Box Drawing Characters
+sidebar_position: 2
+---
 # Unicode Box Drawing Characters
 
 Complete reference for text-based diagram creation.

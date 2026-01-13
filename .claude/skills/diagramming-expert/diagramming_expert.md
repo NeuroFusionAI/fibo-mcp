@@ -1,15 +1,35 @@
 ---
-name: diagramming-expert
-description: Master of text-based visual communication using ASCII art, Unicode box-drawing, and structured diagram notation. Creates clear, maintainable diagrams for systems, processes, hierarchies, relationships, and psychological structures. Proactively generates diagrams to enhance understanding. Activate on visualization needs, system architecture, process flows, psychological mapping, or when complex concepts would benefit from visual representation. NOT for photo editing, vector graphics, or GUI-based design tools.
-allowed-tools: Read,Write,Edit
-category: Content & Writing
-tags:
-  - diagrams
-  - ascii
-  - visualization
-  - architecture
-  - documentation
+sidebar_label: Diagramming Expert
+sidebar_position: 1
 ---
+
+# ✍️ Diagramming Expert
+
+Master of text-based visual communication using ASCII art, Unicode box-drawing, and structured diagram notation. Creates clear, maintainable diagrams for systems, processes, hierarchies, relationships, and psychological structures. Proactively generates diagrams to enhance understanding. Activate on visualization needs, system architecture, process flows, psychological mapping, or when complex concepts would benefit from visual representation. NOT for photo editing, vector graphics, or GUI-based design tools.
+
+---
+
+## Allowed Tools
+
+```
+Read, Write, Edit
+```
+
+## Tags
+
+`diagrams` `ascii` `visualization` `architecture` `documentation`
+
+## 🤝 Pairs Great With
+
+- **[Technical Writer](/docs/skills/technical_writer)**: Visual documentation for technical content
+- **[Api Architect](/docs/skills/api_architect)**: Diagram API architectures
+
+## References
+
+- [Diagram Types Taxonomy](./references/diagram-types)
+- [Jungian Psychology Diagram Patterns](./references/jungian-diagrams)
+- [Diagram Patterns Library](./references/patterns-library)
+- [Unicode Box Drawing Characters](./references/unicode-characters)
 
 # Diagramming Expert
 
@@ -117,8 +137,8 @@ BAD:                         GOOD:
 PROXIMITY:      SIMILARITY:     ENCLOSURE:
 ○ ○   ● ●      ○ ● ○ ● ○      ┌───────────┐
 ○ ○   ● ●      ● ○ ● ○ ●      │ ○ ○ ○ ○ ○ │
-Groups by      Groups by       │ (grouped) │
-nearness       appearance      └───────────┘
+Groups by      Groups by      │ (grouped) │
+nearness       appearance     └───────────┘
 ```
 
 ### 4. Visual Hierarchy
@@ -199,11 +219,11 @@ SIZE HIERARCHY:
 ### Chartjunk
 ```
 ✗ BAD: Excessive decoration
-╔══════════════════════════════════════╗
-║ ╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮  ║
-║ ┃ ★ ★ ★  IMPORTANT INFO  ★ ★ ★    ┃  ║
-║ ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯  ║
-╚══════════════════════════════════════╝
+╔═════════════════════════════════════╗
+║ ╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ║
+║ ┃ ★ ★ ★  IMPORTANT INFO  ★ ★ ★    ┃ ║
+║ ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ║
+╚═════════════════════════════════════╝
 
 ✓ GOOD: Clean and direct
 ┌──────────────────┐
