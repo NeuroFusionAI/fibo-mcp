@@ -19,11 +19,6 @@ Read, Write, Edit
 
 `diagrams` `ascii` `visualization` `architecture` `documentation`
 
-## 🤝 Pairs Great With
-
-- **[Technical Writer](/docs/skills/technical_writer)**: Visual documentation for technical content
-- **[Api Architect](/docs/skills/api_architect)**: Diagram API architectures
-
 ## References
 
 - [Diagram Types Taxonomy](./references/diagram-types)
