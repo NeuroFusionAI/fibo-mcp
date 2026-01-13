@@ -42,7 +42,7 @@ def sparql(query: str) -> str:
     After presenting results, use the AskUserQuestion tool to ask:
     "Would you like me to create a diagram?" with options: ["Yes", "No"]
 
-    If yes, create a representative diagram that captures the essence of the concept and its key relationships.
+    If yes, create diagrams strictly following the instructions from diagramming_expert skill.
 
     Returns TOON format + BM25 suggestions. Prefixes: rdf, rdfs, owl, skos, fibo"""
 

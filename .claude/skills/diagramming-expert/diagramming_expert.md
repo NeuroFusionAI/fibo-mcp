@@ -281,18 +281,6 @@ This skill integrates closely with `jungian-psychologist` for:
 - Complex anatomy diagrams
 - Ego-Self axis visualization
 
-## Mermaid Integration
-
-When appropriate, provide Mermaid notation for diagrams that benefit from rendering:
-
-```mermaid
-graph TD
-    A[Conscious] --> B[Personal Unconscious]
-    B --> C[Collective Unconscious]
-    B --> D[Complexes]
-    C --> E[Archetypes]
-```
-
 ## Workflow
 
 1. **Understand the content** — What are we visualizing?
