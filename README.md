@@ -6,6 +6,12 @@ Give your financial agent access to the Financial Industry Business Ontology (FI
 
 ## Installation
 
+Paste into Claude Code:
+```
+Install fibo-mcp from https://github.com/NeuroFusionAI/fibo-mcp
+```
+
+Or manually:
 ```bash
 git clone https://github.com/NeuroFusionAI/fibo-mcp.git
 cd fibo-mcp
