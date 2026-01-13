@@ -4,13 +4,12 @@ Give your financial agent access to the Financial Industry Business Ontology (FI
 
 <img src="assets/fibo_graph.png" alt="FIBO Graph Visualization" width="500">
 
-## Installation
-
 Paste into Claude Code:
 ```
 Install fibo-mcp from https://github.com/NeuroFusionAI/fibo-mcp
 ```
 
+## Installation
 ```bash
 git clone https://github.com/NeuroFusionAI/fibo-mcp.git
 cd fibo-mcp
@@ -27,13 +26,21 @@ claude mcp add --scope user fibo-mcp -- uv run --directory "$(pwd)" main.py
 The repo includes a diagramming skill (`.claude/skills/diagramming-expert/`) for ASCII visualizations.
 
 When installing via Claude Code, ask user:
-> Where should I install the diagramming skill?
+
+> **Diagramming skill scope:**
 > - [ ] Project scope only (default - already in .claude/skills/)
 > - [ ] User scope (all projects) - copy to ~/.claude/skills/
 
+> **Auto-allow fibo-mcp tool calls?**
+> - [ ] Yes - always allow without confirmation
+> - [ ] No - ask each time (default)
+
 ```bash
-# User scope (optional)
+# User scope skill (optional)
 cp -r .claude/skills/diagramming-expert ~/.claude/skills/
+
+# Auto-allow fibo-mcp (optional)
+claude mcp add-permission --scope user fibo-mcp "mcp__fibo-mcp__sparql"
 ```
 
 ### Other MCP Clients (Cursor, Claude Desktop, etc.)
