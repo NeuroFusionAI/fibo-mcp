@@ -1,30 +1,15 @@
 ---
-sidebar_label: Diagramming Expert
-sidebar_position: 1
+name: diagramming-expert
+description: Master of text-based visual communication using ASCII art, Unicode box-drawing, and structured diagram notation. Creates clear, maintainable diagrams for systems, processes, hierarchies, relationships, and psychological structures. Proactively generates diagrams to enhance understanding. Activate on visualization needs, system architecture, process flows, psychological mapping, or when complex concepts would benefit from visual representation. NOT for photo editing, vector graphics, or GUI-based design tools.
+allowed-tools: Read,Write,Edit
+category: Content & Writing
+tags:
+  - diagrams
+  - ascii
+  - visualization
+  - architecture
+  - documentation
 ---
-
-# ✍️ Diagramming Expert
-
-Master of text-based visual communication using ASCII art, Unicode box-drawing, and structured diagram notation. Creates clear, maintainable diagrams for systems, processes, hierarchies, relationships, and psychological structures. Proactively generates diagrams to enhance understanding. Activate on visualization needs, system architecture, process flows, psychological mapping, or when complex concepts would benefit from visual representation. NOT for photo editing, vector graphics, or GUI-based design tools.
-
----
-
-## Allowed Tools
-
-```
-Read, Write, Edit
-```
-
-## Tags
-
-`diagrams` `ascii` `visualization` `architecture` `documentation`
-
-## References
-
-- [Diagram Types Taxonomy](./references/diagram-types)
-- [Jungian Psychology Diagram Patterns](./references/jungian-diagrams)
-- [Diagram Patterns Library](./references/patterns-library)
-- [Unicode Box Drawing Characters](./references/unicode-characters)
 
 # Diagramming Expert
 
@@ -171,14 +156,14 @@ SIZE HIERARCHY:
 ### Decision Tree
 
 ```
-                ┌─────────┐
-                │ Decision│
-                └────┬────┘
-           ┌────────┴────────┐
-           ▼                 ▼
-      ┌────────┐        ┌────────┐
-      │  Yes   │        │   No   │
-      └────────┘        └────────┘
+                ┌──────────┐
+                │ Decision │
+                └────┬─────┘
+           ┌─────────┴────────┐
+           ▼                  ▼
+      ┌────────┐         ┌────────┐
+      │  Yes   │         │   No   │
+      └────────┘         └────────┘
 ```
 
 ### Layered Architecture

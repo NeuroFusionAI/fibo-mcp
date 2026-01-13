@@ -1,8 +1,3 @@
----
-title: Jungian Psychology Diagram Patterns
-sidebar_label: Jungian Psychology Diagram Pat...
-sidebar_position: 2
----
 # Jungian Psychology Diagram Patterns
 
 Specialized visual patterns for depth psychology work.
