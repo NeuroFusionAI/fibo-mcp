@@ -86,15 +86,6 @@ def fuzzy_search(term: str, top_k: int = 5) -> list[dict[str, Any]]:
     ]
 
 
-def _expand_uri(uri: str) -> str:
-    if uri.startswith("fibo:"):
-        return "https://spec.edmcouncil.org/fibo/ontology/" + uri[5:]
-    for full, prefix in PREFIXES.items():
-        if uri.startswith(prefix):
-            return full + uri[len(prefix) :]
-    return uri
-
-
 def sparql(query: str) -> str:
     graph = get_graph()
     logger.info(
@@ -135,70 +126,3 @@ def sparql(query: str) -> str:
 def search(term: str) -> str:
     results = fuzzy_search(term, top_k=10)
     return encode({"results": results, "count": len(results)})
-
-
-def describe(uri: str) -> str:
-    full_uri = _expand_uri(uri)
-    graph = get_graph()
-    query = f"""
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-    PREFIX owl: <http://www.w3.org/2002/07/owl#>
-    PREFIX cmns-av: <https://www.omg.org/spec/Commons/AnnotationVocabulary/>
-
-    SELECT ?label ?definition ?explanatoryNote ?superclass ?superLabel WHERE {{
-      <{full_uri}> rdfs:label ?label .
-      OPTIONAL {{ <{full_uri}> skos:definition ?definition }}
-      OPTIONAL {{ <{full_uri}> cmns-av:explanatoryNote ?explanatoryNote }}
-      OPTIONAL {{
-        <{full_uri}> rdfs:subClassOf ?superclass .
-        FILTER(isIRI(?superclass))
-        ?superclass rdfs:label ?superLabel .
-      }}
-    }}
-    """
-    try:
-        results = graph.query(query)
-        output = [
-            _compact_result({str(v): str(r[v]) for v in results.vars if r[v]})
-            for r in results
-        ]  # type: ignore
-        return encode(
-            {"uri": _compact_uri(full_uri), "results": output, "count": len(output)}
-        )
-    except Exception as e:
-        return encode({"error": str(e)})
-
-
-def restrictions(uri: str) -> str:
-    full_uri = _expand_uri(uri)
-    graph = get_graph()
-    query = f"""
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    PREFIX owl: <http://www.w3.org/2002/07/owl#>
-
-    SELECT ?property ?propLabel ?type ?target ?targetLabel WHERE {{
-      <{full_uri}> rdfs:subClassOf ?r .
-      ?r a owl:Restriction ; owl:onProperty ?property .
-      OPTIONAL {{ ?property rdfs:label ?propLabel }}
-      OPTIONAL {{ ?r owl:someValuesFrom ?target . BIND("some" AS ?type) }}
-      OPTIONAL {{ ?r owl:allValuesFrom ?target . BIND("only" AS ?type) }}
-      OPTIONAL {{ ?r owl:hasValue ?target . BIND("value" AS ?type) }}
-      OPTIONAL {{ ?target rdfs:label ?targetLabel }}
-    }}
-    """
-    try:
-        results = graph.query(query)
-        output = [
-            _compact_result({str(v): str(r[v]) for v in results.vars if r[v]})
-            for r in results
-        ]  # type: ignore
-        return encode(
-            {
-                "uri": _compact_uri(full_uri),
-                "restrictions": output,
-                "count": len(output),
-            }
-        )
-    except Exception as e:
-        return encode({"error": str(e)})
