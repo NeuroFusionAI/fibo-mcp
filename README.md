@@ -19,6 +19,18 @@ claude mcp add --scope user fibo-mcp -- uv run --directory "$(pwd)" main.py
 # Restart Claude Code to load the MCP
 ```
 
+### With OWL-RL Materialization (Recommended for symbolic reasoning)
+
+Materialization expands the graph from 130K → 616K triples with inferred facts. First run takes ~2 minutes, then cached.
+
+```bash
+# Step 1: Build cache first (Ctrl+C after "Ready to serve")
+uv run main.py --materialize
+
+# Step 2: Add MCP (instant startup from cache)
+claude mcp add --scope user fibo-mcp -- uv run --directory "$(pwd)" main.py --materialize
+```
+
 ### Diagramming Skill
 
 The repo includes a diagramming skill (`.claude/skills/diagramming_expert/`) for ASCII visualizations.
@@ -48,6 +60,20 @@ Add to your MCP config file:
   }
 }
 ```
+
+With materialization:
+```json
+{
+  "mcpServers": {
+    "fibo-mcp": {
+      "command": "uv",
+      "args": ["run", "--directory", "/path/to/fibo-mcp", "main.py", "--materialize"]
+    }
+  }
+}
+```
+
+> Build cache first: `uv run main.py --materialize` (Ctrl+C after "Ready to serve")
 
 ### Uninstall
 
@@ -207,10 +233,20 @@ resp = client.responses.create(
 
 | | |
 |---|---|
-| Data | 129,990 triples (299 RDF/OWL files) |
+| Data | 129K triples (299 RDF/OWL files), 616K with materialization |
 | Coverage | 3,371 classes, 16,057 entities, 1,259 properties |
-| Cache | `./data/fibo.ttl` (auto-downloaded on first run) |
+| Cache | `./data/fibo.ttl` (base), `./data/fibo_materialized.ttl` (with --materialize) |
 | Update | `uv run main.py --force-download` |
+
+### Server Flags
+
+| Flag | Description |
+|------|-------------|
+| `--materialize` | Enable OWL-RL inference (130K → 616K triples, ~2min first run, cached) |
+| `--bm25-top-k N` | Number of BM25 search results (default: 10) |
+| `--force-download` | Re-download FIBO data |
+| `--http` | Run as HTTP server instead of stdio |
+| `--port N` | HTTP server port (default: 8000) |
 
 ## References
 

@@ -5,6 +5,7 @@ requires-python = ">=3.10"
 dependencies = [
   "claude-agent-sdk>=0.1.19",
   "fastmcp>=2.0.0",
+  "owlrl>=7.0.0",
   "rank-bm25>=0.2.2",
   "rdflib>=7.0.0",
   "toon-format",

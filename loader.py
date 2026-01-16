@@ -6,6 +6,7 @@ import shutil
 from pathlib import Path
 
 from rdflib import Graph
+from owlrl import DeductiveClosure, OWLRL_Semantics
 
 logger = logging.getLogger(__name__)
 
@@ -21,29 +22,46 @@ def _fix_dates(ttl: str) -> str:
 # --- Configuration ---
 DATA_DIR = Path(__file__).parent / "data"
 STORE_PATH = DATA_DIR / "fibo.ttl"
+MATERIALIZED_PATH = DATA_DIR / "fibo_materialized.ttl"
 
 
 _graph: Graph | None = None
+_materialized: bool = False
 
 
-def get_graph(force_download: bool = False) -> Graph:
+def get_graph(force_download: bool = False, materialize: bool = False) -> Graph:
     """Load FIBO graph from cache, downloading if needed.
 
     Args:
         force_download: If True, re-download FIBO even if cache exists.
+        materialize: If True, expand graph with OWL-RL inferences (cached after first run).
 
     Returns:
         Loaded RDF graph with FIBO triples.
     """
-    global _graph
+    global _graph, _materialized
 
     if _graph is not None and not force_download:
+        if materialize and not _materialized:
+            _materialize_graph(_graph)
         return _graph
 
     if force_download:
         logger.info("Force download requested. Removing cached data...")
         STORE_PATH.unlink(missing_ok=True)
+        MATERIALIZED_PATH.unlink(missing_ok=True)
         _graph = None
+        _materialized = False
+
+    # Try loading pre-materialized graph first (fast path)
+    if materialize and MATERIALIZED_PATH.exists():
+        logger.info(f"Loading pre-materialized graph from {MATERIALIZED_PATH}...")
+        _graph = Graph()
+        content = _fix_dates(MATERIALIZED_PATH.read_text())
+        _graph.parse(data=content, format="turtle")
+        _materialized = True
+        logger.info(f"Materialized graph loaded with {len(_graph)} triples.")
+        return _graph
 
     if STORE_PATH.exists():
         logger.info(f"Loading graph from {STORE_PATH}...")
@@ -51,12 +69,35 @@ def get_graph(force_download: bool = False) -> Graph:
         content = _fix_dates(STORE_PATH.read_text())
         _graph.parse(data=content, format="turtle")
         logger.info(f"Graph loaded with {len(_graph)} triples.")
+        if materialize:
+            _materialize_graph(_graph)
         return _graph
 
     # Download and build graph
     logger.info(f"{STORE_PATH} not found. Starting download process.")
     _graph = _download_and_build()
+    if materialize:
+        _materialize_graph(_graph)
     return _graph
+
+
+def _materialize_graph(graph: Graph) -> None:
+    """Expand graph with OWL-RL inferences and cache to disk."""
+    global _materialized
+    if _materialized:
+        return
+
+    logger.info("Materializing OWL-RL inferences (this may take ~2 minutes on first run)...")
+    before = len(graph)
+    DeductiveClosure(OWLRL_Semantics).expand(graph)
+    after = len(graph)
+    _materialized = True
+    logger.info(f"Graph expanded from {before} to {after} triples (+{after - before} inferred)")
+
+    # Cache materialized graph for fast subsequent loads
+    logger.info(f"Caching materialized graph to {MATERIALIZED_PATH}...")
+    graph.serialize(MATERIALIZED_PATH, format="turtle")
+    logger.info("Materialized graph cached.")
 
 
 def _download_and_build() -> Graph:

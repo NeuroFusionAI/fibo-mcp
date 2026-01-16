@@ -1,21 +1,18 @@
+import hashlib
 import logging
 import re
+from functools import lru_cache
 from typing import Any
 
 from toon_format import encode
 
+from constants import PREFIXES, SPARQL_CACHE_SIZE
 from loader import get_graph
 
 logger = logging.getLogger(__name__)
 
-PREFIXES = {
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#": "rdf:",
-    "http://www.w3.org/2000/01/rdf-schema#": "rdfs:",
-    "http://www.w3.org/2002/07/owl#": "owl:",
-    "http://www.w3.org/2004/02/skos/core#": "skos:",
-    "https://www.omg.org/spec/Commons/AnnotationVocabulary/": "cmns-av:",
-    "https://spec.edmcouncil.org/fibo/ontology/": "fibo:",
-}
+# Configurable at runtime via main.py --bm25-top-k
+BM25_TOP_K = 10
 
 
 def _compact_uri(uri: str) -> str:
@@ -71,7 +68,7 @@ def _extract_search_term(query: str) -> str | None:
     return None
 
 
-def fuzzy_search(term: str, top_k: int = 5) -> list[dict[str, Any]]:
+def fuzzy_search(term: str, top_k: int = BM25_TOP_K) -> list[dict[str, Any]]:
     bm25, docs = _get_bm25()
     scores = bm25.get_scores(term.lower().split())
     top_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
@@ -86,32 +83,40 @@ def fuzzy_search(term: str, top_k: int = 5) -> list[dict[str, Any]]:
     ]
 
 
-def sparql(query: str) -> str:
+@lru_cache(maxsize=SPARQL_CACHE_SIZE)
+def _cached_sparql(query_hash: str, query: str) -> list[dict[str, str]]:
+    """Execute SPARQL and return results (cached by query hash)."""
     graph = get_graph()
+    results = graph.query(query)
+    output = []
+    for row in results:
+        output.append(
+            _compact_result(
+                {
+                    str(var): str(row[var])
+                    for var in results.vars
+                    if row[var] is not None
+                }
+            )
+        )
+    return output
+
+
+def sparql(query: str) -> str:
     logger.info(
         f"Executing SPARQL query: {query[:80]}{'...' if len(query) > 80 else ''}"
     )
 
     try:
-        results = graph.query(query)
-        output = []
-        for row in results:
-            output.append(
-                _compact_result(
-                    {
-                        str(var): str(row[var])
-                        for var in results.vars
-                        if row[var] is not None
-                    }
-                )
-            )  # type: ignore
+        query_hash = hashlib.sha256(query.encode()).hexdigest()
+        output = _cached_sparql(query_hash, query)
 
         logger.info(f"SPARQL query returned {len(output)} results.")
         result: dict[str, Any] = {"results": output, "count": len(output)}
 
         term = _extract_search_term(query)
         if term:
-            result["suggestions"] = fuzzy_search(term, top_k=10)
+            result["suggestions"] = fuzzy_search(term)
             logger.info(
                 f"Added {len(result['suggestions'])} BM25 suggestions for '{term}'"
             )
@@ -124,5 +129,5 @@ def sparql(query: str) -> str:
 
 
 def search(term: str) -> str:
-    results = fuzzy_search(term, top_k=10)
+    results = fuzzy_search(term)
     return encode({"results": results, "count": len(results)})
