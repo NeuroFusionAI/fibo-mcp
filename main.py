@@ -57,16 +57,23 @@ DeFi (AMM, liquidity pool) | Crypto (stablecoin, NFT) | Islamic (sukuk, murabaha
 FIBO TERM MAPPINGS:
 money→Currency | stock→Share | bank→FinancialInstitution | company→LegalEntity | country→SovereignState
 
-Returns TOON format + BM25 suggestions. Built-in prefixes: rdf, rdfs, owl, skos.
+Returns compact JSON + BM25 suggestions. Built-in prefixes: rdf, rdfs, owl, skos.
 FIBO URIs use the module-specific prefixes loaded from the ontology (e.g.
 fibo-sec-eq-eq:Share, fibo-fbc-fi-fi:Security). When a URI cannot be compacted
 to a valid QName, the server returns the absolute IRI in angle brackets
 (``<https://spec.edmcouncil.org/fibo/ontology/...>``); use that form in your
 SPARQL query.
 
+LLM-FRIENDLY QUERYING:
+Prefer terminology-rich, incident-style rows. The compact URI is a handle; label,
+definition, superclass labels, property labels, and restrictions carry the meaning.
+For one entity, use inspect(uri) to fetch its local semantic neighborhood in one call.
+
 QUERY TEMPLATES:
 
-Define: SELECT ?c ?label ?def WHERE { ?c rdfs:label ?label . FILTER(CONTAINS(LCASE(?label), "term")) OPTIONAL { ?c skos:definition ?def } } LIMIT 10
+Define: SELECT ?c ?label ?def WHERE { ?c rdfs:label ?label . FILTER(CONTAINS(LCASE(STR(?label)), "term")) OPTIONAL { ?c skos:definition ?def } } LIMIT 10
+
+Inspect via SPARQL: SELECT ?c ?label ?def ?parent ?parentLabel WHERE { BIND(fibo-sec-eq-eq:Share AS ?c) OPTIONAL { ?c rdfs:label ?label } OPTIONAL { ?c skos:definition ?def } OPTIONAL { ?c rdfs:subClassOf ?parent . ?parent rdfs:label ?parentLabel } } LIMIT 20
 
 Hierarchy: SELECT ?ancestor ?label WHERE { <uri> rdfs:subClassOf+ ?ancestor . ?ancestor rdfs:label ?label }
 
@@ -74,9 +81,23 @@ Children: SELECT ?child ?label WHERE { ?child rdfs:subClassOf <uri> . ?child rdf
 
 Properties: SELECT ?p ?target ?tLabel WHERE { <uri> ?p ?target . FILTER(?p != rdf:type && ?p != rdfs:subClassOf) OPTIONAL { ?target rdfs:label ?tLabel } }
 
-Restrictions: SELECT ?prop ?constraint ?val WHERE { <uri> rdfs:subClassOf ?r . ?r a owl:Restriction; owl:onProperty ?prop . OPTIONAL { ?r owl:someValuesFrom ?val . BIND("someValuesFrom" AS ?constraint) } }"""
+Restrictions: SELECT ?prop ?propLabel ?constraint ?val WHERE { <uri> rdfs:subClassOf ?r . ?r a owl:Restriction; owl:onProperty ?prop . OPTIONAL { ?prop rdfs:label ?propLabel } OPTIONAL { ?r owl:someValuesFrom ?val . BIND("someValuesFrom" AS ?constraint) } }"""
 
     return fibo.sparql(query)
+
+
+@mcp.tool()
+def inspect(identifier: str, limit: int = 10) -> str:
+    """Inspect one FIBO class/entity as an LLM-friendly local graph neighborhood.
+
+Use this after discovering a compact URI such as fibo-sec-eq-eq:Share. It returns
+compact JSON with the queryable URI, labels, definitions, direct parent/child
+classes, and direct OWL restrictions. This is usually better than asking for only
+a bare URI because LLMs understand terminology and incident neighborhoods more
+reliably than isolated graph handles.
+"""
+
+    return fibo.inspect(identifier, limit)
 
 
 if __name__ == "__main__":
