@@ -1,11 +1,12 @@
 import hashlib
+import json
 import logging
 import re
 from functools import lru_cache
 from typing import Any
 
 from rdflib import BNode, Graph, URIRef
-from toon_format import encode
+from rdflib.namespace import OWL, RDF, RDFS, SKOS
 
 from constants import PREFIXES, SPARQL_CACHE_SIZE
 from loader import get_graph
@@ -14,6 +15,25 @@ logger = logging.getLogger(__name__)
 
 # Configurable at runtime via main.py --bm25-top-k
 BM25_TOP_K = 10
+
+# Definitions are useful for LLM grounding, but BM25 suggestions are side-channel
+# hints. Keep them bounded so a typo/lookup query does not drown out SPARQL rows.
+SUGGESTION_DEF_MAX_CHARS = 360
+
+
+def _encode(result: dict[str, Any]) -> str:
+    """Return compact JSON for MCP responses.
+
+    Compact JSON is standard, broadly represented in LLM pretraining data, and
+    benchmarked slightly smaller than TOON for definition-heavy FIBO payloads.
+    """
+    return json.dumps(result, ensure_ascii=False, separators=(",", ":"))
+
+
+def _truncate(text: str, max_chars: int = SUGGESTION_DEF_MAX_CHARS) -> str:
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - 1].rstrip() + "…"
 
 
 def _compact_static_uri(uri: str) -> str:
@@ -63,6 +83,30 @@ def _format_node(node: Any, graph: Graph) -> str:
     return str(node)
 
 
+def _resolve_identifier(identifier: str, graph: Graph) -> URIRef:
+    """Resolve a queryable QName, ``<IRI>``, or raw IRI to a URIRef."""
+    ident = identifier.strip()
+    if ident.startswith("<") and ident.endswith(">"):
+        return URIRef(ident[1:-1])
+    if ident.startswith("http://") or ident.startswith("https://"):
+        return URIRef(ident)
+    return URIRef(graph.namespace_manager.expand_curie(ident))
+
+
+def _unique_formatted(nodes: Any, graph: Graph, limit: int | None = None) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for node in nodes:
+        formatted = _format_node(node, graph)
+        if formatted in seen:
+            continue
+        seen.add(formatted)
+        out.append(formatted)
+        if limit is not None and len(out) >= limit:
+            break
+    return out
+
+
 _bm25_index = None
 _docs_data = None
 
@@ -94,6 +138,7 @@ def _get_bm25():
 def _extract_search_term(query: str) -> str | None:
     patterns = [
         r'CONTAINS\s*\(\s*LCASE\s*\(\s*\?\w+\s*\)\s*,\s*["\']([^"\']+)["\']',
+        r'CONTAINS\s*\(\s*LCASE\s*\(\s*STR\s*\(\s*\?\w+\s*\)\s*\)\s*,\s*["\']([^"\']+)["\']',
         r'CONTAINS\s*\(\s*STR\s*\(\s*\?\w+\s*\)\s*,\s*["\']([^"\']+)["\']',
         r'CONTAINS\s*\(\s*\?\w+\s*,\s*["\']([^"\']+)["\']',
         r'=\s*["\']([^"\']+)["\']',
@@ -115,15 +160,20 @@ def fuzzy_search(term: str, top_k: int | None = None) -> list[dict[str, Any]]:
     bm25, docs = _get_bm25()
     scores = bm25.get_scores(term.lower().split())
     top_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
-    return [
-        {
+
+    suggestions = []
+    for i in top_idx:
+        if scores[i] <= 0:
+            continue
+        suggestion = {
             "uri": _format_node(URIRef(docs[i]["uri"]), graph),
             "label": docs[i]["label"],
             "score": round(scores[i], 2),
         }
-        for i in top_idx
-        if scores[i] > 0
-    ]
+        if docs[i]["definition"]:
+            suggestion["def"] = _truncate(docs[i]["definition"])
+        suggestions.append(suggestion)
+    return suggestions
 
 
 @lru_cache(maxsize=SPARQL_CACHE_SIZE)
@@ -162,13 +212,110 @@ def sparql(query: str) -> str:
                 f"Added {len(result['suggestions'])} BM25 suggestions for '{term}'"
             )
 
-        return encode(result)
+        return _encode(result)
 
     except Exception as e:
         logger.error(f"SPARQL query failed: {e}")
-        return encode({"error": str(e)})
+        return _encode({"error": str(e)})
 
 
 def search(term: str) -> str:
     results = fuzzy_search(term)
-    return encode({"results": results, "count": len(results)})
+    return _encode({"results": results, "count": len(results)})
+
+
+def inspect(identifier: str, limit: int = 10) -> str:
+    """Return an incident-style semantic neighborhood for one FIBO node.
+
+    The output keeps the compact, queryable ID but places terminology and local
+    graph structure next to it: labels, definitions, direct parents/children,
+    and OWL restrictions. This is deliberately LLM-friendly: identifiers remain
+    short handles, while labels/definitions carry meaning.
+    """
+    graph = get_graph()
+    try:
+        uri = _resolve_identifier(identifier, graph)
+    except Exception as e:
+        return _encode({"error": f"Could not resolve identifier {identifier!r}: {e}"})
+
+    try:
+        labels = _unique_formatted(graph.objects(uri, RDFS.label), graph, limit)
+        definitions = _unique_formatted(graph.objects(uri, SKOS.definition), graph, limit)
+
+        parent_rows = []
+        for parent in graph.objects(uri, RDFS.subClassOf):
+            if isinstance(parent, BNode):
+                continue
+            parent_rows.append(
+                {
+                    "uri": _format_node(parent, graph),
+                    "label": next(
+                        (str(label) for label in graph.objects(parent, RDFS.label)), ""
+                    ),
+                }
+            )
+            if len(parent_rows) >= limit:
+                break
+
+        child_rows = []
+        for child in graph.subjects(RDFS.subClassOf, uri):
+            child_rows.append(
+                {
+                    "uri": _format_node(child, graph),
+                    "label": next(
+                        (str(label) for label in graph.objects(child, RDFS.label)), ""
+                    ),
+                }
+            )
+            if len(child_rows) >= limit:
+                break
+
+        restriction_rows = []
+        for restriction in graph.objects(uri, RDFS.subClassOf):
+            if not isinstance(restriction, BNode):
+                continue
+            if (restriction, RDF.type, OWL.Restriction) not in graph:
+                continue
+
+            row: dict[str, str] = {"node": _format_node(restriction, graph)}
+            prop = graph.value(restriction, OWL.onProperty)
+            if prop is not None:
+                row["onProperty"] = _format_node(prop, graph)
+                prop_label = graph.value(prop, RDFS.label)
+                if prop_label is not None:
+                    row["propertyLabel"] = str(prop_label)
+
+            for pred, key in [
+                (OWL.someValuesFrom, "someValuesFrom"),
+                (OWL.allValuesFrom, "allValuesFrom"),
+                (OWL.hasValue, "hasValue"),
+                (OWL.onClass, "onClass"),
+                (OWL.onDataRange, "onDataRange"),
+                (OWL.cardinality, "cardinality"),
+                (OWL.minCardinality, "minCardinality"),
+                (OWL.maxCardinality, "maxCardinality"),
+                (OWL.qualifiedCardinality, "qualifiedCardinality"),
+                (OWL.minQualifiedCardinality, "minQualifiedCardinality"),
+                (OWL.maxQualifiedCardinality, "maxQualifiedCardinality"),
+            ]:
+                value = graph.value(restriction, pred)
+                if value is not None:
+                    row[key] = _format_node(value, graph)
+
+            restriction_rows.append(row)
+            if len(restriction_rows) >= limit:
+                break
+
+        result: dict[str, Any] = {
+            "uri": _format_node(uri, graph),
+            "label": labels,
+            "def": definitions,
+            "parents": parent_rows,
+            "children": child_rows,
+            "restrictions": restriction_rows,
+        }
+        return _encode(result)
+
+    except Exception as e:
+        logger.error(f"Inspect failed for {identifier!r}: {e}")
+        return _encode({"error": str(e)})

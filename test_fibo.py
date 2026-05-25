@@ -1,5 +1,11 @@
+import json
+
 import fibo
 from loader import get_graph
+
+
+def _json_result(output: str):
+    return json.loads(output)
 
 
 def test_sparql_basic_query():
@@ -9,58 +15,60 @@ def test_sparql_basic_query():
         ?s rdfs:label ?label .
     } LIMIT 5
     """
-    result = fibo.sparql(query)
-    assert "results[" in result
-    assert "count:" in result
+    result = _json_result(fibo.sparql(query))
+    assert "results" in result
+    assert "count" in result
+    assert isinstance(result["results"], list)
 
 
 def test_sparql_text_search():
     query = """
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-    
+
     SELECT ?concept ?label ?definition WHERE {
         ?concept rdfs:label ?label .
         OPTIONAL { ?concept skos:definition ?definition }
         FILTER(CONTAINS(LCASE(?label), "currency"))
     } LIMIT 10
     """
-    result = fibo.sparql(query)
-    assert "results[" in result
-    assert "suggestions[" in result
+    result = _json_result(fibo.sparql(query))
+    assert "results" in result
+    assert "suggestions" in result
+    assert result["suggestions"]
 
 
 def test_sparql_property_paths():
     query = """
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX owl: <http://www.w3.org/2002/07/owl#>
-    
+
     SELECT ?subclass WHERE {
         ?subclass rdfs:subClassOf+ owl:Thing .
     } LIMIT 10
     """
-    result = fibo.sparql(query)
-    assert "results[" in result
+    result = _json_result(fibo.sparql(query))
+    assert "results" in result
 
 
 def test_sparql_aggregation():
     query = """
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX owl: <http://www.w3.org/2002/07/owl#>
-    
+
     SELECT (COUNT(?class) as ?total) WHERE {
         ?class a owl:Class .
     }
     """
-    result = fibo.sparql(query)
-    assert "results[" in result
-    assert "total" in result
+    result = _json_result(fibo.sparql(query))
+    assert "results" in result
+    assert "total" in result["results"][0]
 
 
 def test_sparql_invalid_query():
     query = "INVALID SPARQL SYNTAX"
-    result = fibo.sparql(query)
-    assert "error:" in result
+    result = _json_result(fibo.sparql(query))
+    assert "error" in result
 
 
 def test_sparql_prefix_compression():
@@ -70,7 +78,7 @@ def test_sparql_prefix_compression():
     }
     """
     result = fibo.sparql(query)
-    assert "rdfs:" in result or "owl:" in result or "fibo:" in result
+    assert "rdfs:" in result or "owl:" in result or "fibo-" in result
 
 
 def test_graph_initialization():
@@ -113,9 +121,9 @@ def test_compacted_fibo_module_prefix_is_queryable():
         fibo-sec-eq-eq:Share rdfs:label ?label .
     } LIMIT 1
     """
-    result = fibo.sparql(query)
-    assert "share" in result
-    assert "error:" not in result
+    result = _json_result(fibo.sparql(query))
+    assert result["results"][0]["label"] == "share"
+    assert "error" not in result
 
 
 def test_bm25_top_k_runtime_override():
@@ -127,3 +135,19 @@ def test_bm25_top_k_runtime_override():
         assert len(results) <= 3
     finally:
         fibo.BM25_TOP_K = original
+
+
+def test_bm25_suggestions_include_definitions_when_available():
+    results = fibo.fuzzy_search("currency")
+    assert results
+    assert any("def" in row for row in results)
+
+
+def test_inspect_returns_incident_semantic_neighborhood():
+    result = _json_result(fibo.inspect("fibo-sec-eq-eq:Share"))
+    assert result["uri"] == "fibo-sec-eq-eq:Share"
+    assert "share" in result["label"]
+    assert "parents" in result
+    assert "children" in result
+    assert "restrictions" in result
+    assert any(parent["label"] == "equity instrument" for parent in result["parents"])
