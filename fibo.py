@@ -16,11 +16,6 @@ logger = logging.getLogger(__name__)
 # Configurable at runtime via main.py --bm25-top-k
 BM25_TOP_K = 10
 
-# Definitions are useful for LLM grounding, but BM25 suggestions are side-channel
-# hints. Keep them bounded so a typo/lookup query does not drown out SPARQL rows.
-SUGGESTION_DEF_MAX_CHARS = 360
-
-
 def _encode(result: dict[str, Any]) -> str:
     """Return compact JSON for MCP responses.
 
@@ -28,12 +23,6 @@ def _encode(result: dict[str, Any]) -> str:
     benchmarked slightly smaller than TOON for definition-heavy FIBO payloads.
     """
     return json.dumps(result, ensure_ascii=False, separators=(",", ":"))
-
-
-def _truncate(text: str, max_chars: int = SUGGESTION_DEF_MAX_CHARS) -> str:
-    if len(text) <= max_chars:
-        return text
-    return text[: max_chars - 1].rstrip() + "…"
 
 
 def _compact_static_uri(uri: str) -> str:
@@ -171,7 +160,7 @@ def fuzzy_search(term: str, top_k: int | None = None) -> list[dict[str, Any]]:
             "score": round(scores[i], 2),
         }
         if docs[i]["definition"]:
-            suggestion["def"] = _truncate(docs[i]["definition"])
+            suggestion["def"] = docs[i]["definition"]
         suggestions.append(suggestion)
     return suggestions
 

@@ -143,6 +143,38 @@ def test_bm25_suggestions_include_definitions_when_available():
     assert any("def" in row for row in results)
 
 
+def test_bm25_definitions_are_returned_verbatim():
+    """FIBO definitions are bounded prose; we must not silently truncate them.
+
+    Truncation breaks string equality, regex matching, and any downstream
+    code path that round-trips definitions back into the graph or compares
+    them. The corpus itself is the only legitimate upper bound.
+    """
+    from rdflib import URIRef
+    from loader import get_graph
+
+    graph = get_graph()
+    # Re-resolve each suggestion's compact URI back to the absolute IRI used
+    # as the BM25 corpus key, so we can compare definitions exactly.
+    docs_by_uri = {d["uri"]: d for d in fibo._docs_data or []}
+
+    results = fibo.fuzzy_search("currency")
+    checked = 0
+    for row in results:
+        if "def" not in row:
+            continue
+        absolute = str(graph.namespace_manager.expand_curie(row["uri"]))
+        assert absolute in docs_by_uri, f"compact URI did not round-trip: {row['uri']}"
+        full = docs_by_uri[absolute]["definition"]
+        assert row["def"] == full, (
+            f"suggestion definition was truncated for {row['uri']!r}: "
+            f"got {len(row['def'])} chars, corpus has {len(full)} chars"
+        )
+        assert "…" not in row["def"], "ellipsis sentinel must not appear"
+        checked += 1
+    assert checked > 0, "no suggestions with definitions were checked"
+
+
 def test_inspect_returns_incident_semantic_neighborhood():
     result = _json_result(fibo.inspect("fibo-sec-eq-eq:Share"))
     assert result["uri"] == "fibo-sec-eq-eq:Share"
