@@ -77,3 +77,53 @@ def test_graph_initialization():
     g = get_graph()
     assert g is not None
     assert len(g) > 0
+
+
+def test_fibo_uri_compaction_uses_queryable_module_prefix():
+    """FIBO URIs must be compacted with their loaded module prefix.
+
+    The previous implementation produced strings like
+    ``fibo:SEC/Equities/EquityInstruments/Share`` which are syntactically
+    invalid SPARQL QNames and therefore cannot be pasted back into a
+    follow-up query. The graph already ships a per-module prefix
+    (``fibo-sec-eq-eq``) which is queryable.
+    """
+    query = """
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    SELECT ?c ?label WHERE {
+        ?c rdfs:label ?label .
+        FILTER(LCASE(STR(?label)) = "share")
+    } LIMIT 5
+    """
+    result = fibo.sparql(query)
+    assert "fibo-sec-eq-eq:Share" in result
+    # Regression: the old broken pseudo-CURIE must not leak back in.
+    assert "fibo:SEC/Equities/EquityInstruments/Share" not in result
+
+
+def test_compacted_fibo_module_prefix_is_queryable():
+    """The compact form returned by the server must be a valid QName.
+
+    We round-trip the compacted identifier through SPARQL to prove that
+    callers can reuse it without first having to look up the absolute IRI.
+    """
+    query = """
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    SELECT ?label WHERE {
+        fibo-sec-eq-eq:Share rdfs:label ?label .
+    } LIMIT 1
+    """
+    result = fibo.sparql(query)
+    assert "share" in result
+    assert "error:" not in result
+
+
+def test_bm25_top_k_runtime_override():
+    """``fibo.BM25_TOP_K`` must be honoured at call time, not import time."""
+    original = fibo.BM25_TOP_K
+    try:
+        fibo.BM25_TOP_K = 3
+        results = fibo.fuzzy_search("currency")
+        assert len(results) <= 3
+    finally:
+        fibo.BM25_TOP_K = original

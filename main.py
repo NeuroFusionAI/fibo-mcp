@@ -31,8 +31,10 @@ ALWAYS use this tool when:
 THREE-STAGE SYMBOLIC REASONING:
 
 1. SYMBOL ABSTRACTION (ground terms to FIBO classes):
-   User term "stock" → FIBO class fibo:Share (abstract variable)
-   User term "bank" → FIBO class fibo:FinancialInstitution
+   User term "stock" → FIBO class such as fibo-sec-eq-eq:Share (abstract variable)
+   User term "bank" → FIBO class such as fibo-fbc-fct-fse:Bank
+   FIBO ships per-module prefixes (e.g. fibo-sec-eq-eq, fibo-fbc-fi-fi); the
+   server returns whichever module prefix is actually loaded for the URI.
    Use FILTER(CONTAINS(LCASE(?label), "term")) to find mappings
 
 2. SYMBOLIC INDUCTION (reason over abstract patterns):
@@ -42,7 +44,7 @@ THREE-STAGE SYMBOLIC REASONING:
    These patterns are INVARIANT - same reasoning applies regardless of specific classes
 
 3. RETRIEVAL (map back to user's domain):
-   FIBO result fibo:Share → explain in user's terms "a stock/share/equity"
+   FIBO result fibo-sec-eq-eq:Share → explain in user's terms "a stock/share/equity"
    Always translate FIBO URIs back to natural language
 
 FIBO IS A REASONING SCAFFOLD, NOT A PRIOR DISTRIBUTION:
@@ -55,7 +57,12 @@ DeFi (AMM, liquidity pool) | Crypto (stablecoin, NFT) | Islamic (sukuk, murabaha
 FIBO TERM MAPPINGS:
 money→Currency | stock→Share | bank→FinancialInstitution | company→LegalEntity | country→SovereignState
 
-Returns TOON format + BM25 suggestions. Prefixes: rdf, rdfs, owl, skos, fibo
+Returns TOON format + BM25 suggestions. Built-in prefixes: rdf, rdfs, owl, skos.
+FIBO URIs use the module-specific prefixes loaded from the ontology (e.g.
+fibo-sec-eq-eq:Share, fibo-fbc-fi-fi:Security). When a URI cannot be compacted
+to a valid QName, the server returns the absolute IRI in angle brackets
+(``<https://spec.edmcouncil.org/fibo/ontology/...>``); use that form in your
+SPARQL query.
 
 QUERY TEMPLATES:
 

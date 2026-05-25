@@ -4,6 +4,7 @@ import re
 from functools import lru_cache
 from typing import Any
 
+from rdflib import BNode, Graph, URIRef
 from toon_format import encode
 
 from constants import PREFIXES, SPARQL_CACHE_SIZE
@@ -15,15 +16,51 @@ logger = logging.getLogger(__name__)
 BM25_TOP_K = 10
 
 
-def _compact_uri(uri: str) -> str:
+def _compact_static_uri(uri: str) -> str:
+    """Compact a URI using only the static, non-FIBO prefix table.
+
+    This is used as a fallback when RDFLib's namespace manager cannot
+    produce a valid QName (typically because the local name would contain
+    characters that are illegal in a QName).
+    """
     for full, prefix in PREFIXES.items():
         if uri.startswith(full):
-            return prefix + uri[len(full) :]
+            return prefix + uri[len(full):]
     return uri
 
 
-def _compact_result(row: dict[str, str]) -> dict[str, str]:
-    return {k: _compact_uri(v) for k, v in row.items()}
+def _format_node(node: Any, graph: Graph) -> str:
+    """Render an RDFLib term as a queryable, human-readable string.
+
+    For :class:`~rdflib.URIRef` we prefer prefixes that the loaded graph
+    actually knows about (FIBO ships per-module prefixes such as
+    ``fibo-sec-eq-eq``), because those are valid SPARQL QNames and can be
+    pasted back into a follow-up query. If no such QName exists we fall
+    back to the static prefix table and finally to an angle-bracketed
+    absolute IRI.
+    """
+    if isinstance(node, URIRef):
+        try:
+            prefix, _namespace, local = graph.namespace_manager.compute_qname(
+                node, generate=False
+            )
+            # ``compute_qname`` does not guarantee a syntactically valid
+            # local name; reject anything that contains characters which
+            # would make the result unusable in SPARQL.
+            if local and not any(ch in local for ch in "/#?"):
+                return f"{prefix}:{local}"
+        except (KeyError, ValueError):
+            pass
+
+        compact = _compact_static_uri(str(node))
+        if compact != str(node):
+            return compact
+        return f"<{node}>"
+
+    if isinstance(node, BNode):
+        return f"_:{node}"
+
+    return str(node)
 
 
 _bm25_index = None
@@ -68,13 +105,19 @@ def _extract_search_term(query: str) -> str | None:
     return None
 
 
-def fuzzy_search(term: str, top_k: int = BM25_TOP_K) -> list[dict[str, Any]]:
+def fuzzy_search(term: str, top_k: int | None = None) -> list[dict[str, Any]]:
+    # ``BM25_TOP_K`` may be mutated at runtime by ``main.py`` (``--bm25-top-k``),
+    # so resolve the default lazily instead of binding it at definition time.
+    if top_k is None:
+        top_k = BM25_TOP_K
+
+    graph = get_graph()
     bm25, docs = _get_bm25()
     scores = bm25.get_scores(term.lower().split())
     top_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
     return [
         {
-            "uri": _compact_uri(docs[i]["uri"]),
+            "uri": _format_node(URIRef(docs[i]["uri"]), graph),
             "label": docs[i]["label"],
             "score": round(scores[i], 2),
         }
@@ -91,13 +134,11 @@ def _cached_sparql(query_hash: str, query: str) -> list[dict[str, str]]:
     output = []
     for row in results:
         output.append(
-            _compact_result(
-                {
-                    str(var): str(row[var])
-                    for var in results.vars
-                    if row[var] is not None
-                }
-            )
+            {
+                str(var): _format_node(row[var], graph)
+                for var in results.vars
+                if row[var] is not None
+            }
         )
     return output
 
