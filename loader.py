@@ -1,5 +1,5 @@
-import sys
 import re
+import os
 import logging
 import subprocess
 import shutil
@@ -23,6 +23,13 @@ def _fix_dates(ttl: str) -> str:
 DATA_DIR = Path(__file__).parent / "data"
 STORE_PATH = DATA_DIR / "fibo.ttl"
 MATERIALIZED_PATH = DATA_DIR / "fibo_materialized.ttl"
+REVISION_PATH = DATA_DIR / "fibo_revision.txt"
+FIBO_REVISION = os.environ.get(
+    "FIBO_REVISION",
+    "f59157fe156e3d91b1c045222d0a7dc06b7d78a2",
+).lower()
+if not re.fullmatch(r"[0-9a-fA-F]{40}", FIBO_REVISION):
+    raise ValueError("FIBO_REVISION must be a full 40-character Git commit hash")
 
 
 _graph: Graph | None = None
@@ -50,8 +57,20 @@ def get_graph(force_download: bool = False, materialize: bool = False) -> Graph:
         logger.info("Force download requested. Removing cached data...")
         STORE_PATH.unlink(missing_ok=True)
         MATERIALIZED_PATH.unlink(missing_ok=True)
+        REVISION_PATH.unlink(missing_ok=True)
         _graph = None
         _materialized = False
+
+    cached_revision = REVISION_PATH.read_text().strip() if REVISION_PATH.exists() else None
+    if cached_revision != FIBO_REVISION:
+        if STORE_PATH.exists() or MATERIALIZED_PATH.exists():
+            logger.warning(
+                "Discarding FIBO cache for revision %s; expected %s",
+                cached_revision or "unknown",
+                FIBO_REVISION,
+            )
+        STORE_PATH.unlink(missing_ok=True)
+        MATERIALIZED_PATH.unlink(missing_ok=True)
 
     # Try loading pre-materialized graph first (fast path)
     if materialize and MATERIALIZED_PATH.exists():
@@ -109,41 +128,48 @@ def _download_and_build() -> Graph:
         logger.info(f"Removing existing FIBO directory at {FIBO_DIR}")
         shutil.rmtree(FIBO_DIR)
 
-    logger.info("Cloning FIBO repository... (This may take a few minutes)")
+    logger.info("Fetching pinned FIBO revision %s...", FIBO_REVISION)
     try:
-        subprocess.run(
-            [
-                "git",
-                "clone",
-                "--depth=1",
-                "https://github.com/edmcouncil/fibo.git",
-                str(FIBO_DIR),
-            ],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
+        FIBO_DIR.mkdir()
+        commands = [
+            ["git", "init", str(FIBO_DIR)],
+            ["git", "-C", str(FIBO_DIR), "remote", "add", "origin", "https://github.com/edmcouncil/fibo.git"],
+            ["git", "-C", str(FIBO_DIR), "fetch", "--depth=1", "origin", FIBO_REVISION],
+            ["git", "-C", str(FIBO_DIR), "checkout", "--detach", "FETCH_HEAD"],
+        ]
+        for command in commands:
+            subprocess.run(command, check=True, capture_output=True, text=True)
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to clone FIBO: {e.stderr}")
-        sys.exit(1)
+        shutil.rmtree(FIBO_DIR, ignore_errors=True)
+        raise RuntimeError(f"Failed to fetch pinned FIBO revision {FIBO_REVISION}") from e
 
     logger.info("Loading all RDF/OWL files into graph...")
     graph = Graph()
     files = list(FIBO_DIR.rglob("*.rdf")) + list(FIBO_DIR.rglob("*.owl"))
 
     logger.info(f"Found {len(files)} RDF/OWL files to process")
+    parse_errors: list[str] = []
     for i, f in enumerate(files, 1):
         if i % 50 == 0:
             logger.info(f"Processing file {i}/{len(files)}...")
         try:
             graph.parse(f, format="xml")
         except Exception as e:
-            logger.warning(f"Could not parse {f.name}: {e}")
+            parse_errors.append(f"{f}: {e}")
+
+    if parse_errors:
+        sample = "\n".join(parse_errors[:10])
+        shutil.rmtree(FIBO_DIR, ignore_errors=True)
+        raise RuntimeError(
+            f"FIBO build aborted: {len(parse_errors)} RDF/OWL files failed to parse.\n{sample}"
+        )
 
     logger.info(
         f"Graph loaded with {len(graph)} triples. Serializing to {STORE_PATH}..."
     )
     graph.serialize(STORE_PATH, format="turtle")
+    REVISION_PATH.write_text(FIBO_REVISION + "\n")
 
     logger.info("Cleaning up downloaded files...")
     shutil.rmtree(FIBO_DIR)

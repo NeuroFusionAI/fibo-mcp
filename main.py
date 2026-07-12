@@ -26,7 +26,7 @@ ALWAYS use this tool when:
     1. Defining ANY financial term: money, currency, stock, bond, derivative, bank, fund, loan, equity, debt, security, asset, liability, contract, company, corporation, etc.
     2. Reasoning about financial relationships and regulations
     3. Explaining how financial concepts connect to each other
-    4. Providing authoritative, industry-standard definitions
+    4. Retrieving industry-consensus ontology definitions
 
 THREE-STAGE SYMBOLIC REASONING:
 
@@ -110,13 +110,21 @@ if __name__ == "__main__":
     parser.add_argument(
         "--materialize",
         action="store_true",
-        help="Enable OWL-RL materialization for full symbolic reasoning (~2min first run, cached after). Recommended for inference-heavy queries.",
+        help="Enable OWL-RL profile materialization (adds startup time, cached after). Recommended for inference-heavy queries.",
     )
     parser.add_argument(
         "--http", action="store_true", help="Run as HTTP server instead of stdio"
     )
     parser.add_argument(
         "--port", type=int, default=8000, help="HTTP server port (default: 8000)"
+    )
+    parser.add_argument(
+        "--host", default="127.0.0.1", help="HTTP bind host (default: 127.0.0.1)"
+    )
+    parser.add_argument(
+        "--allow-remote-http",
+        action="store_true",
+        help="Acknowledge that a non-loopback HTTP listener needs external authentication and rate limiting",
     )
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Enable debug logging"
@@ -137,7 +145,7 @@ if __name__ == "__main__":
     logger.info("Initializing FIBO graph...")
     get_graph(force_download=args.force_download, materialize=args.materialize)
     if not args.materialize:
-        logger.info("Tip: Use --materialize for OWL-RL inference (expands 130K→616K triples, cached after first run)")
+        logger.info("Tip: Use --materialize for OWL-RL inference; the expanded graph is cached after the first run")
 
     logger.info("Pre-building BM25 search index...")
     fibo._get_bm25()
@@ -145,8 +153,10 @@ if __name__ == "__main__":
     logger.info("Initialization complete. Ready to serve queries.")
 
     if args.http:
-        logger.info(f"Starting HTTP server on port {args.port}...")
-        mcp.run(transport="http", port=args.port)
+        if args.host not in {"127.0.0.1", "localhost", "::1"} and not args.allow_remote_http:
+            parser.error("non-loopback --host requires --allow-remote-http")
+        logger.info(f"Starting HTTP server on {args.host}:{args.port}...")
+        mcp.run(transport="http", host=args.host, port=args.port)
     else:
         logger.info("Starting FIBO MCP server in stdio mode...")
         mcp.run()

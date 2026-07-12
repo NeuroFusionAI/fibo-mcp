@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 
 # Configurable at runtime via main.py --bm25-top-k
 BM25_TOP_K = 10
+SPARQL_MAX_QUERY_CHARS = 20_000
+SPARQL_MAX_ROWS = 1_000
 
 def _encode(result: dict[str, Any]) -> str:
     """Return compact JSON for MCP responses.
@@ -179,6 +181,8 @@ def _cached_sparql(query_hash: str, query: str) -> list[dict[str, str]]:
                 if row[var] is not None
             }
         )
+        if len(output) > SPARQL_MAX_ROWS:
+            break
     return output
 
 
@@ -188,11 +192,21 @@ def sparql(query: str) -> str:
     )
 
     try:
+        if len(query) > SPARQL_MAX_QUERY_CHARS:
+            raise ValueError(f"query exceeds {SPARQL_MAX_QUERY_CHARS} characters")
+        if re.search(r"\b(SERVICE|LOAD|CLEAR|CREATE|DROP|MOVE|COPY|ADD|INSERT|DELETE)\b", query, re.IGNORECASE):
+            raise ValueError("remote or mutating SPARQL operations are not allowed")
         query_hash = hashlib.sha256(query.encode()).hexdigest()
         output = _cached_sparql(query_hash, query)
 
+        truncated = len(output) > SPARQL_MAX_ROWS
+        output = output[:SPARQL_MAX_ROWS]
         logger.info(f"SPARQL query returned {len(output)} results.")
-        result: dict[str, Any] = {"results": output, "count": len(output)}
+        result: dict[str, Any] = {
+            "results": output,
+            "count": len(output),
+            "truncated": truncated,
+        }
 
         term = _extract_search_term(query)
         if term:

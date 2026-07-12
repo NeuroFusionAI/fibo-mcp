@@ -21,7 +21,9 @@ claude mcp add --scope user fibo-mcp -- uv run --directory "$(pwd)" main.py
 
 ### With OWL-RL Materialization (Recommended for symbolic reasoning)
 
-Materialization expands the graph from 130K → 616K triples with inferred facts. First run takes ~2 minutes, then cached.
+Materialization applies the OWL-RL profile and caches the inferred graph. Triple
+counts depend on the pinned FIBO revision. OWL-RL is a scalable subset of OWL,
+not unrestricted or complete OWL reasoning.
 
 ```bash
 # Step 1: Build cache first (Ctrl+C after "Ready to serve")
@@ -203,48 +205,36 @@ Finance has a semantics problem—the same "trade," "counterparty," or "position
 
 Contributors include Citigroup, Deutsche Bank, Goldman Sachs, State Street, Wells Fargo, CFTC, US Treasury OFR, and others. Standardized by EDM Council and OMG.
 
-## Remote MCP (OpenAI, etc.)
+## HTTP MCP (local by default)
+
+The HTTP listener binds to `127.0.0.1` by default. Do not expose it directly to
+the internet: the server accepts read-only SPARQL and caps returned rows, but it
+does not provide application authentication or rate limiting. Put an
+authenticated, rate-limited gateway in front of it before any remote use.
 
 ```bash
 # Start HTTP server
 uv run main.py --http --port 8000
 
-# Expose via ngrok (in another terminal)
-ngrok http 8000
-```
-
-```python
-from openai import OpenAI
-
-client = OpenAI()
-resp = client.responses.create(
-    model="gpt-5.2",
-    tools=[{
-        "type": "mcp",
-        "server_label": "fibo",
-        "server_url": "https://your-ngrok-url.ngrok.io/mcp",
-        "require_approval": "never",
-    }],
-    input="What is a derivative according to FIBO?",
-)
 ```
 
 ## Technical Details
 
 | | |
 |---|---|
-| Data | 129K triples (299 RDF/OWL files), 616K with materialization |
+| Data | 299 RDF/OWL source files at the pinned revision; loaded triple count is logged at startup |
 | Coverage | 3,371 classes, 16,057 entities, 1,259 properties |
 | Cache | `./data/fibo.ttl` (base), `./data/fibo_materialized.ttl` (with --materialize) |
-| Update | `uv run main.py --force-download` |
+| Source revision | `f59157fe156e3d91b1c045222d0a7dc06b7d78a2` by default; override with `FIBO_REVISION` |
+| Refresh cache | `uv run main.py --force-download` |
 
 ### Server Flags
 
 | Flag | Description |
 |------|-------------|
-| `--materialize` | Enable OWL-RL inference (130K → 616K triples, ~2min first run, cached) |
+| `--materialize` | Enable OWL-RL inference (adds startup time; the materialized graph is cached) |
 | `--bm25-top-k N` | Number of BM25 search results (default: 10) |
-| `--force-download` | Re-download FIBO data |
+| `--force-download` | Re-download the configured FIBO revision |
 | `--http` | Run as HTTP server instead of stdio |
 | `--port N` | HTTP server port (default: 8000) |
 

@@ -71,6 +71,23 @@ def test_sparql_invalid_query():
     assert "error" in result
 
 
+def test_sparql_blocks_remote_service_queries():
+    result = _json_result(fibo.sparql(
+        'SELECT * WHERE { SERVICE <https://example.com/sparql> { ?s ?p ?o } }'
+    ))
+    assert "error" in result
+    assert "not allowed" in result["error"]
+
+
+def test_sparql_caps_returned_rows(monkeypatch):
+    monkeypatch.setattr(fibo, "SPARQL_MAX_ROWS", 3)
+    fibo._cached_sparql.cache_clear()
+    result = _json_result(fibo.sparql("SELECT ?s WHERE { ?s ?p ?o }"))
+    assert result["count"] == 3
+    assert result["truncated"] is True
+    fibo._cached_sparql.cache_clear()
+
+
 def test_sparql_prefix_compression():
     query = """
     SELECT ?p ?v WHERE {
