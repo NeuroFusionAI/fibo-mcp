@@ -5,7 +5,8 @@ import subprocess
 import shutil
 from pathlib import Path
 
-from rdflib import Graph
+from rdflib import Graph, URIRef
+from rdflib.namespace import OWL, RDF
 from owlrl import DeductiveClosure, OWLRL_Semantics
 
 logger = logging.getLogger(__name__)
@@ -34,6 +35,32 @@ if not re.fullmatch(r"[0-9a-fA-F]{40}", FIBO_REVISION):
 
 _graph: Graph | None = None
 _materialized: bool = False
+
+
+def graph_stats(graph: Graph | None = None) -> dict[str, int | str]:
+    """Return reproducible base-graph counts with explicit definitions."""
+    if graph is None:
+        graph = get_graph()
+    property_types = {
+        RDF.Property,
+        OWL.ObjectProperty,
+        OWL.DatatypeProperty,
+        OWL.AnnotationProperty,
+    }
+    properties = {
+        subject
+        for property_type in property_types
+        for subject in graph.subjects(RDF.type, property_type)
+    }
+    return {
+        "revision": FIBO_REVISION,
+        "triples": len(graph),
+        "owl_classes": len(set(graph.subjects(RDF.type, OWL.Class))),
+        "typed_properties": len(properties),
+        "uri_subjects": len({
+            subject for subject in graph.subjects() if isinstance(subject, URIRef)
+        }),
+    }
 
 
 def get_graph(force_download: bool = False, materialize: bool = False) -> Graph:
@@ -106,7 +133,7 @@ def _materialize_graph(graph: Graph) -> None:
     if _materialized:
         return
 
-    logger.info("Materializing OWL-RL inferences (this may take ~2 minutes on first run)...")
+    logger.info("Materializing OWL-RL inferences; runtime depends on the local environment...")
     before = len(graph)
     DeductiveClosure(OWLRL_Semantics).expand(graph)
     after = len(graph)

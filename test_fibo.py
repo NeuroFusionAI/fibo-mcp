@@ -1,7 +1,7 @@
 import json
 
 import fibo
-from loader import get_graph
+from loader import get_graph, graph_stats
 
 
 def _json_result(output: str):
@@ -102,6 +102,28 @@ def test_graph_initialization():
     g = get_graph()
     assert g is not None
     assert len(g) > 0
+
+
+def test_base_graph_stats_match_pinned_revision():
+    assert graph_stats() == {
+        "revision": "f59157fe156e3d91b1c045222d0a7dc06b7d78a2",
+        "triples": 133498,
+        "owl_classes": 3346,
+        "typed_properties": 1216,
+        "uri_subjects": 16665,
+    }
+
+
+def test_common_language_queries_surface_intended_concepts_first():
+    expected = {
+        "money": "currency",
+        "country": "sovereign state",
+        "corporate": "corporation",
+    }
+    for term, label in expected.items():
+        results = fibo.fuzzy_search(term, top_k=3)
+        assert results[0]["label"].lower() == label
+        assert results[0]["match"] == "concept_alias"
 
 
 def test_fibo_uri_compaction_uses_queryable_module_prefix():

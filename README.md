@@ -189,9 +189,10 @@ A corporation is a legal entity separate from its owners:
 
 *Claude automatically queries FIBO...*
 
-**Stock Corporation**: *"corporation that has shareholders, each of whom receives a portion of the ownership of the corporation through shares of stock"*
+**Corporation**: *"formal organization that is a legal entity (artificial person) distinct from its owners, created under the jurisdiction of the laws of a state or nation"*
 
-**Contractually Capable Entity**: *"unique entity that is legally or financially responsible for the performance of financial transactions, or has the legal right in its jurisdiction to enter independently into legal contracts"*
+Related subclasses include **Stock Corporation**, **For Profit Corporation**,
+and **Not-for-Profit Corporation**.
 
 Formation: **Articles of Incorporation**, **Corporate Bylaws**
 
@@ -223,7 +224,7 @@ uv run main.py --http --port 8000
 | | |
 |---|---|
 | Data | 299 RDF/OWL source files at the pinned revision; loaded triple count is logged at startup |
-| Coverage | 3,371 classes, 16,057 entities, 1,259 properties |
+| Base graph | 133,498 triples; 3,346 `owl:Class` subjects; 1,216 typed RDF/OWL properties; 16,665 URI subjects |
 | Cache | `./data/fibo.ttl` (base), `./data/fibo_materialized.ttl` (with --materialize) |
 | Source revision | `f59157fe156e3d91b1c045222d0a7dc06b7d78a2` by default; override with `FIBO_REVISION` |
 | Refresh cache | `uv run main.py --force-download` |

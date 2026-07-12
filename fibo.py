@@ -18,6 +18,14 @@ BM25_TOP_K = 10
 SPARQL_MAX_QUERY_CHARS = 20_000
 SPARQL_MAX_ROWS = 1_000
 
+CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
+    "money": ("currency", "monetary amount"),
+    "country": ("sovereign state",),
+    "corporate": ("corporation", "stock corporation"),
+    "company": ("corporation",),
+    "stock": ("share",),
+}
+
 def _encode(result: dict[str, Any]) -> str:
     """Return compact JSON for MCP responses.
 
@@ -149,8 +157,17 @@ def fuzzy_search(term: str, top_k: int | None = None) -> list[dict[str, Any]]:
 
     graph = get_graph()
     bm25, docs = _get_bm25()
-    scores = bm25.get_scores(term.lower().split())
-    top_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
+    normalized = " ".join(term.lower().split())
+    preferred_labels = CONCEPT_ALIASES.get(normalized, ())
+    expanded = " ".join((normalized, *preferred_labels))
+    scores = bm25.get_scores(expanded.split())
+    preferred_idx = [
+        i for label in preferred_labels
+        for i, doc in enumerate(docs)
+        if doc["label"].lower() == label
+    ]
+    ranked_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)
+    top_idx = list(dict.fromkeys(preferred_idx + ranked_idx))[:top_k]
 
     suggestions = []
     for i in top_idx:
@@ -161,6 +178,8 @@ def fuzzy_search(term: str, top_k: int | None = None) -> list[dict[str, Any]]:
             "label": docs[i]["label"],
             "score": round(scores[i], 2),
         }
+        if docs[i]["label"].lower() in preferred_labels:
+            suggestion["match"] = "concept_alias"
         if docs[i]["definition"]:
             suggestion["def"] = docs[i]["definition"]
         suggestions.append(suggestion)
