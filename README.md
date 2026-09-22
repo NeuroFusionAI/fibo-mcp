@@ -241,13 +241,29 @@ uv run main.py --http --port 8000
 
 ## Citation
 
-If you use fibo-mcp in your work, please cite:
+If you use **fibo-mcp** in your research or software, please cite it using the
+following BibTeX entry:
 
-> Jung, Anthony W. *fibo-mcp: Open-source MCP for financial ontology* [Computer software]. https://github.com/NeuroFusionAI/fibo-mcp
+```bibtex
+@software{jung_fibo_mcp,
+  author  = {Jung, Anthony W.},
+  title   = {{fibo-mcp}: Open-source {MCP} for financial ontology},
+  url     = {https://github.com/NeuroFusionAI/fibo-mcp},
+  license = {MIT}
+}
+```
 
-Citation metadata is available in [CITATION.cff](CITATION.cff).
-The software is licensed under the [MIT License](LICENSE). Citation is appreciated
-but is not an additional license condition.
+**APA**
+
+> Jung, A. W. (n.d.). *fibo-mcp: Open-source MCP for financial ontology* [Computer software]. https://github.com/NeuroFusionAI/fibo-mcp
+
+Download [CITATION.bib](CITATION.bib), or use **Cite this repository** on GitHub
+to export a citation from [CITATION.cff](CITATION.cff). For reproducibility,
+also report the release tag or commit SHA used in your work.
+
+## License
+
+fibo-mcp is distributed under the [MIT License](LICENSE).
 
 ## References
 

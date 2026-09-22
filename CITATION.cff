@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use fibo-mcp in your work, please cite this software."
+message: "If you use fibo-mcp in your research or software, please cite it using the metadata below."
 type: software
 title: "fibo-mcp: Open-source MCP for financial ontology"
 authors:
