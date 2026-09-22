@@ -5,7 +5,7 @@ import re
 from functools import lru_cache
 from typing import Any
 
-from rdflib import BNode, Graph, URIRef
+from rdflib import BNode, Graph, Literal, URIRef
 from rdflib.namespace import OWL, RDF, RDFS, SKOS
 
 from constants import PREFIXES, SPARQL_CACHE_SIZE
@@ -25,6 +25,20 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     "company": ("corporation",),
     "stock": ("share",),
 }
+
+# FIBO's authoring guide uses these ontology annotations for alternate names.
+# Accept skos:altLabel as well for older or externally supplied graphs.
+SEARCH_ANNOTATIONS = (
+    URIRef("https://www.omg.org/spec/Commons/AnnotationVocabulary/synonym"),
+    URIRef("https://www.omg.org/spec/Commons/AnnotationVocabulary/abbreviation"),
+    URIRef("https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/commonDesignation"),
+    URIRef("https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/preferredDesignation"),
+    SKOS.altLabel,
+)
+
+
+def _normalize_term(term: str) -> str:
+    return " ".join(term.lower().split())
 
 def _encode(result: dict[str, Any]) -> str:
     """Return compact JSON for MCP responses.
@@ -108,28 +122,48 @@ def _unique_formatted(nodes: Any, graph: Graph, limit: int | None = None) -> lis
 
 _bm25_index = None
 _docs_data = None
+_exact_matches: dict[str, list[tuple[int, str, str]]] = {}
 
 
 def _get_bm25():
-    global _bm25_index, _docs_data
+    global _bm25_index, _docs_data, _exact_matches
     if _bm25_index is None:
         from rank_bm25 import BM25Okapi
 
         graph = get_graph()
-        results = graph.query("""
-            SELECT ?c ?label ?def WHERE {
-                ?c a <http://www.w3.org/2002/07/owl#Class> .
-                ?c <http://www.w3.org/2000/01/rdf-schema#label> ?label .
-                OPTIONAL { ?c <http://www.w3.org/2004/02/skos/core#definition> ?def }
-            }
-        """)
         _docs_data = []
+        _exact_matches = {}
         corpus = []
-        for r in results:
-            uri, label = str(r.c), str(r.label)  # type: ignore
-            defn = str(r["def"]) if r["def"] else ""  # type: ignore
-            _docs_data.append({"uri": uri, "label": label, "definition": defn})
-            corpus.append(f"{label} {defn}".lower().split())
+        # One document per class, with stable ordering for tied scores. Multiple
+        # labels/definitions must not create duplicate search candidates.
+        for uri in sorted(set(graph.subjects(RDF.type, OWL.Class)), key=str):
+            if not isinstance(uri, URIRef):
+                continue
+
+            def literals(predicate):
+                values = [v for v in graph.objects(uri, predicate)
+                          if isinstance(v, Literal) and str(v).strip()]
+                return sorted(values, key=lambda v: (
+                    bool(v.language and not v.language.lower().startswith("en")),
+                    str(v), v.language or ""))
+
+            labels = literals(RDFS.label)
+            if not labels:
+                continue
+            definitions = literals(SKOS.definition)
+            annotations = [(str(predicate), str(value))
+                           for predicate in SEARCH_ANNOTATIONS
+                           for value in literals(predicate)]
+            index = len(_docs_data)
+            _docs_data.append({"uri": str(uri), "label": str(labels[0]),
+                               "definition": str(definitions[0]) if definitions else ""})
+            names = [(str(RDFS.label), str(label)) for label in labels] + annotations
+            for predicate, text in names:
+                _exact_matches.setdefault(_normalize_term(text), []).append(
+                    (index, predicate, text))
+            texts = [str(value) for value in (*labels, *definitions)]
+            texts.extend(text for _, text in annotations)
+            corpus.append(" ".join(texts).lower().split())
         _bm25_index = BM25Okapi(corpus)
     return _bm25_index, _docs_data
 
@@ -155,31 +189,50 @@ def fuzzy_search(term: str, top_k: int | None = None) -> list[dict[str, Any]]:
     if top_k is None:
         top_k = BM25_TOP_K
 
+    normalized = _normalize_term(term)
+    if not normalized or top_k <= 0:
+        return []
+
     graph = get_graph()
     bm25, docs = _get_bm25()
-    normalized = " ".join(term.lower().split())
     preferred_labels = CONCEPT_ALIASES.get(normalized, ())
     expanded = " ".join((normalized, *preferred_labels))
     scores = bm25.get_scores(expanded.split())
+    # Exact ontology labels precede alternate names. Local aliases remain
+    # explicit heuristics and never override an exact ontology match.
+    exact = {}
+    for index, predicate, text in sorted(
+        _exact_matches.get(normalized, ()),
+        key=lambda row: (row[1] != str(RDFS.label), docs[row[0]]["uri"], row[1], row[2]),
+    ):
+        exact.setdefault(index, (predicate, text))
     preferred_idx = [
-        i for label in preferred_labels
-        for i, doc in enumerate(docs)
-        if doc["label"].lower() == label
+        index for label in preferred_labels
+        for index, predicate, _ in _exact_matches.get(label, ())
+        if predicate == str(RDFS.label)
     ]
     ranked_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)
-    top_idx = list(dict.fromkeys(preferred_idx + ranked_idx))[:top_k]
+    ranked_idx = [i for i in ranked_idx if scores[i] > 0]
+    top_idx = list(dict.fromkeys([*exact, *preferred_idx, *ranked_idx]))[:top_k]
 
     suggestions = []
     for i in top_idx:
-        if scores[i] <= 0:
-            continue
         suggestion = {
             "uri": _format_node(URIRef(docs[i]["uri"]), graph),
             "label": docs[i]["label"],
             "score": round(scores[i], 2),
         }
-        if docs[i]["label"].lower() in preferred_labels:
+        if i in exact:
+            predicate, text = exact[i]
+            suggestion["match"] = "label" if predicate == str(RDFS.label) else "ontology_annotation"
+            suggestion["matched_text"] = text
+            suggestion["match_source"] = predicate
+        elif i in preferred_idx:
             suggestion["match"] = "concept_alias"
+            suggestion["matched_text"] = normalized
+            suggestion["match_source"] = "local:CONCEPT_ALIASES"
+        else:
+            suggestion["match"] = "bm25"
         if docs[i]["definition"]:
             suggestion["def"] = docs[i]["definition"]
         suggestions.append(suggestion)

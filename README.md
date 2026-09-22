@@ -87,6 +87,29 @@ claude mcp remove fibo-mcp
 rm -rf ~/.claude/skills/diagramming-expert
 ```
 
+## Tools
+
+Use `search(term)` to find candidate FIBO classes, `inspect(identifier)` to check
+their definitions and direct relationships, and `sparql(query)` for specific
+graph queries. Returned identifiers can be reused across all three tools.
+
+Use FIBO when terminology or ontology relationships help the task. It does not
+provide company financials, market prices, or forecasts, and a search match does
+not establish that two concepts are equivalent.
+
+Search indexes class labels, definitions, and FIBO's synonym, abbreviation,
+common-designation and preferred-designation annotations. It also accepts legacy
+`skos:altLabel` annotations. Exact labels rank first, then exact ontology
+annotations, local terminology hints, and BM25 matches. Ties are stable by class
+IRI, and each class appears once. Definitions are returned without truncation.
+
+Each result identifies its match type: `label`, `ontology_annotation`,
+`concept_alias` (a local heuristic), or `bm25`. Exact matches include
+`matched_text` and `match_source`, the annotation predicate IRI or
+`local:CONCEPT_ALIASES`. The `score` field is the lexical BM25 score, not a
+probability or the priority used for exact matches. The pinned ontology is
+unchanged; these annotations improve lookup rather than adding financial facts.
+
 ## Examples
 
 ### "What is money?"
