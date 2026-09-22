@@ -87,6 +87,16 @@ claude mcp remove fibo-mcp
 rm -rf ~/.claude/skills/diagramming-expert
 ```
 
+## Tools
+
+Use `search(term)` to find candidate FIBO classes, `inspect(identifier)` to check
+their definitions and direct relationships, and `sparql(query)` for specific
+graph queries. Returned identifiers can be reused across all three tools.
+
+Use FIBO when terminology or ontology relationships help the task. It does not
+provide company financials, market prices, or forecasts, and a search match does
+not establish that two concepts are equivalent.
+
 ## Examples
 
 ### "What is money?"
