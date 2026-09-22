@@ -239,6 +239,16 @@ uv run main.py --http --port 8000
 | `--http` | Run as HTTP server instead of stdio |
 | `--port N` | HTTP server port (default: 8000) |
 
+## Citation
+
+If you use fibo-mcp in your work, please cite:
+
+> Jung, Anthony W. *fibo-mcp: Open-source MCP for financial ontology* [Computer software]. https://github.com/NeuroFusionAI/fibo-mcp
+
+Citation metadata is available in [CITATION.cff](CITATION.cff).
+The software is licensed under the [MIT License](LICENSE). Citation is appreciated
+but is not an additional license condition.
+
 ## References
 
 - [FIBO Specification](https://spec.edmcouncil.org/fibo)

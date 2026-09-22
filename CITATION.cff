@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use fibo-mcp in your work, please cite this software."
+type: software
+title: "fibo-mcp: Open-source MCP for financial ontology"
+authors:
+  - family-names: "Jung"
+    given-names: "Anthony W."
+repository-code: "https://github.com/NeuroFusionAI/fibo-mcp"
+url: "https://github.com/NeuroFusionAI/fibo-mcp"
+license: MIT
