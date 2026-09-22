@@ -239,6 +239,15 @@ uv run main.py --http --port 8000
 | `--http` | Run as HTTP server instead of stdio |
 | `--port N` | HTTP server port (default: 8000) |
 
+## License
+
+fibo-mcp is distributed under the [MIT License](LICENSE).
+
+## References
+
+- [FIBO Specification](https://spec.edmcouncil.org/fibo)
+- [Diagramming Skill](https://github.com/erichowens/some_claude_skills/tree/main/.claude/skills/diagramming-expert)
+
 ## Citation
 
 If you use **fibo-mcp** in your research or software, please cite it using the
@@ -260,12 +269,3 @@ following BibTeX entry:
 Download [CITATION.bib](CITATION.bib), or use **Cite this repository** on GitHub
 to export a citation from [CITATION.cff](CITATION.cff). For reproducibility,
 also report the release tag or commit SHA used in your work.
-
-## License
-
-fibo-mcp is distributed under the [MIT License](LICENSE).
-
-## References
-
-- [FIBO Specification](https://spec.edmcouncil.org/fibo)
-- [Diagramming Skill](https://github.com/erichowens/some_claude_skills/tree/main/.claude/skills/diagramming-expert)
