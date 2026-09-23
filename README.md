@@ -4,20 +4,32 @@ Give your financial agent access to the Financial Industry Business Ontology (FI
 
 <img src="assets/fibo_graph.png" alt="FIBO Graph Visualization" width="500">
 
-Paste into Claude Code:
+You can also ask an AI assistant to install it:
 ```
 Install fibo-mcp from https://github.com/NeuroFusionAI/fibo-mcp
 ```
 
 ## Installation
 
-If already in fibo-mcp directory, skip clone and cd. Run all commands from the fibo-mcp directory:
+If already in fibo-mcp directory, skip clone and cd. Run the setup commands from the fibo-mcp directory:
 ```bash
 git clone https://github.com/NeuroFusionAI/fibo-mcp.git && cd fibo-mcp
 uv sync
-claude mcp add --scope user fibo-mcp -- uv run --directory "$(pwd)" main.py
-# Restart Claude Code to load the MCP
 ```
+
+Connect it to your MCP client using the matching command below, or the JSON configuration further down.
+
+**Codex**
+```bash
+codex mcp add fibo-mcp -- uv run --directory "$(pwd)" main.py
+```
+
+**Claude Code**
+```bash
+claude mcp add --scope user fibo-mcp -- uv run --directory "$(pwd)" main.py
+```
+
+Restart or reload your client if needed to load the MCP.
 
 ### With OWL-RL Materialization (Recommended for symbolic reasoning)
 
@@ -26,16 +38,15 @@ counts depend on the pinned FIBO revision. OWL-RL is a scalable subset of OWL,
 not unrestricted or complete OWL reasoning.
 
 ```bash
-# Step 1: Build cache first (Ctrl+C after "Ready to serve")
+# Build cache first (Ctrl+C after "Ready to serve")
 uv run main.py --materialize
-
-# Step 2: Add MCP (instant startup from cache)
-claude mcp add --scope user fibo-mcp -- uv run --directory "$(pwd)" main.py --materialize
 ```
+
+Then append `--materialize` after `main.py` in your client's launch command or configuration.
 
 ### Other MCP Clients (Cursor, Claude Desktop, etc.)
 
-Add to your MCP config file:
+For clients using `mcpServers` JSON, add this to your MCP config file and replace `/path/to/fibo-mcp` with the absolute checkout path:
 
 ```json
 {
@@ -64,8 +75,9 @@ With materialization:
 
 ### Uninstall
 
+Remove `fibo-mcp` from your client's MCP configuration. For Claude Code:
+
 ```bash
-# Claude Code
 claude mcp remove fibo-mcp
 ```
 
