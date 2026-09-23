@@ -257,6 +257,7 @@ fibo-mcp is distributed under the [MIT License](LICENSE).
 If you use **fibo-mcp** in your research or software, please cite it using the
 following BibTeX entry:
 
+**BibTeX**
 ```bibtex
 @software{jung_fibo_mcp,
   author  = {Jung, Anthony W.},
@@ -267,8 +268,9 @@ following BibTeX entry:
 ```
 
 **APA**
-
-> Jung, A. W. (n.d.). *fibo-mcp: Open-source MCP for financial ontology* [Computer software]. https://github.com/NeuroFusionAI/fibo-mcp
+```
+Jung, A. W. (n.d.). *fibo-mcp: Open-source MCP for financial ontology* [Computer software]. https://github.com/NeuroFusionAI/fibo-mcp
+```
 
 Download [CITATION.bib](CITATION.bib), or use **Cite this repository** on GitHub
 to export a citation from [CITATION.cff](CITATION.cff). For reproducibility,
