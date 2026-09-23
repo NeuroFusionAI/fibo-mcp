@@ -33,21 +33,6 @@ uv run main.py --materialize
 claude mcp add --scope user fibo-mcp -- uv run --directory "$(pwd)" main.py --materialize
 ```
 
-### Diagramming Skill
-
-The repo includes a diagramming skill (`.claude/skills/diagramming_expert/`) for ASCII visualizations.
-
-When installing via Claude Code, ask user:
-
-> **Diagramming skill scope:**
-> - [ ] Project scope only (default - already in .claude/skills/)
-> - [ ] User scope (all projects) - copy to ~/.claude/skills/
-
-```bash
-# User scope skill (optional)
-cp -r .claude/skills/diagramming_expert ~/.claude/skills/
-```
-
 ### Other MCP Clients (Cursor, Claude Desktop, etc.)
 
 Add to your MCP config file:
@@ -82,9 +67,6 @@ With materialization:
 ```bash
 # Claude Code
 claude mcp remove fibo-mcp
-
-# Remove user-scope skill (if installed)
-rm -rf ~/.claude/skills/diagramming-expert
 ```
 
 ## Tools
@@ -269,7 +251,6 @@ fibo-mcp is distributed under the [MIT License](LICENSE).
 ## References
 
 - [FIBO Specification](https://spec.edmcouncil.org/fibo)
-- [Diagramming Skill](https://github.com/erichowens/some_claude_skills/tree/main/.claude/skills/diagramming-expert)
 
 ## Citation
 
